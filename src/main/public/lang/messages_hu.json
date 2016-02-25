@@ -1,0 +1,24 @@
+{
+    "-- Select language --": "-- Válasszon nyelvet --",
+    "hu": "Magyar",
+    "en": "Angol",
+
+    "accountId": "Felhasználó",
+    "date": "Dátum",
+    "title": "Cím",
+    "note": "Leírás",
+
+    "List Blogs": "Blogok",
+    "List Comments": "Megjegyzések",
+
+    "Log in": "Bejelentkezés",
+    "Log out": "Kijelentkezés",
+    "Main page": "Fő oldal",
+
+    "OK": "Rendben",
+    "Cancel": "Mégsem",
+    "Save": "Ment",
+    "Delete": "Töröl",
+
+    "required": "kötelező"
+}
