@@ -8,7 +8,7 @@ case class Config(host: String = "localhost", port: Int = 9000,
     router: Option[String] = None, mode: Option[String] = None)
 
 object Main extends App {
-    implicit val actorSystem = ActorSystem("james")
+    val actorSystem = ActorSystem("james")
 
     val parser = new scopt.OptionParser[Config]("james") {
         head("james", "1.0")

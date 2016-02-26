@@ -4,7 +4,7 @@ import core._
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Props}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ContentType, ContentTypes, HttpEntity, HttpResponse, MediaTypes}
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.{Route, RouteResult}
@@ -20,12 +20,12 @@ import org.joda.time.DateTime
 
 class Service(val config: Config, val routerDefined: Boolean)
     extends Actor
-    with BlogFormats
-    with CommentFormats
-    with BlogsDirectives
+    with BlogDirectives
     with ActorLogging
 {
-    val model = context.actorSelection("../" + Model.name)
+    val modelBlog = context.actorSelection("../" + ModelBlog.name)
+    val modelComment = context.actorSelection("../" + ModelComment.name)
+
     val tickActor: Option[ActorSelection] =
         if (routerDefined) Some(context.actorSelection("../" + TickActor.name))
         else None
@@ -77,60 +77,6 @@ class Service(val config: Config, val routerDefined: Boolean)
         } else route
     }
 
-    def handleBlogs = pathEnd {
-        respondWithLinks(
-            blogListLink("self"),
-            blogItemLink("item", methods = List(GET, PUT, DELETE)),
-            blogItemLink("new", "new"))
-        {
-            headComplete ~
-            getList[Blog](Blog)()
-        }
-    }
-
-    def handleNewBlogs = path("new") {
-        get {
-            val uuid = UUID.randomUUID.toString
-            respondWithLinks(blogItemLink("self", uuid, methods = List(GET, PUT))) {
-                complete(Blog(uuid, "john", DateTime.now, "", ""))
-            }
-        }
-    }
-
-    def handleBlog(blogId: String) = pathEnd {
-        respondWithLinks(
-            blogListLink("blogs"),
-            blogItemLink("self", blogId, methods = List(GET, PUT, DELETE)),
-            commentListLink(blogId, "comments", GET),
-            commentItemLink(blogId, "new", PUT))
-        {
-            headComplete ~
-            getEntity[Blog](blogId) ~
-            putEntity[Blog](_.copy(id = blogId), blogId) ~
-            deleteEntity[Blog](blogId)
-        }
-    } ~
-    pathPrefix("comments") {
-        handleComments(blogId) ~
-        pathPrefix(Segment)(handleComment(blogId) _)
-    }
-
-    def handleComments(blogId: String) = pathEnd {
-        commentLinks(blogId) {
-            headComplete ~
-            getList[Comment](Comment)(blogId)
-        }
-    }
-
-    def handleComment(blogId: String)(commentId: String) = pathEnd {
-        (blogLinks & commentLinks(blogId)) {
-            headComplete ~
-            getEntity[Comment](blogId, commentId) ~
-            putEntity[Comment](_.copy(id = commentId, blogId = blogId), blogId) ~
-            deleteEntity[Comment](blogId, commentId)
-        }
-    }
-
     def receive = {
         case _ =>
     }
@@ -141,4 +87,3 @@ object Service {
         Props(new Service(config, routerDefined))
     def name = "service"
 }
-// vim: set ts=4 sw=4 et:

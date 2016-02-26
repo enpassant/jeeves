@@ -12,7 +12,8 @@ class Supervisor(val config: Config) extends Actor with ActorLogging {
   }
   tickActor.map(_ ! Tick)
 
-  val model = context.actorOf(Model.props(config.mode), Model.name)
+  val modelBlog = context.actorOf(ModelBlog.props(config.mode), ModelBlog.name)
+  val modelComment = context.actorOf(ModelComment.props(config.mode), ModelComment.name)
   val service = context.actorOf(Service.props(config, tickActor.isDefined), Service.name)
 
   def receive = {

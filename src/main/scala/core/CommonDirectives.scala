@@ -14,8 +14,6 @@ import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
 trait CommonDirectives extends BaseFormats {
-    val model: ActorSelection
-
     implicit val timeout = Timeout(10.seconds)
     import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -61,7 +59,9 @@ trait CommonDirectives extends BaseFormats {
                 mediaRanges.find(mt => mt.matches(mediaType)).flatMap( _.params get "version")
     }
 
-    def getList[T: ClassTag](t: Any)(params: Any*)(implicit m: ToEntityMarshaller[Seq[T]]) = get {
+    def getList[T: ClassTag](model: ActorSelection, t: Any)(params: Any*)
+        (implicit m: ToEntityMarshaller[Seq[T]]) = get
+    {
         parameters('offset ? 0, 'limit ? 3) { (offset: Int, limit: Int) =>
             { ctx =>
                 (model ? ListWithOffset(t, params, offset, limit)) flatMap {
@@ -72,7 +72,9 @@ trait CommonDirectives extends BaseFormats {
         }
     }
 
-    def getEntity[T: ClassTag](ids: String*)(implicit m: ToEntityMarshaller[T]) = get {
+    def getEntity[T: ClassTag](model: ActorSelection, ids: String*)
+        (implicit m: ToEntityMarshaller[T]) = get
+    {
         { ctx =>
             (model ? GetEntity(ids:_*)) flatMap {
                 case Some(entity: T) => ctx.complete(entity)
@@ -81,7 +83,7 @@ trait CommonDirectives extends BaseFormats {
         }
     }
 
-    def putEntity[T : ClassTag](modify: T => T, ids: String*)
+    def putEntity[T : ClassTag](model: ActorSelection, modify: T => T, ids: String*)
         (implicit u: FromRequestUnmarshaller[T], m: ToEntityMarshaller[T]) = put {
         entity(as[T]) { entity => ctx =>
             (model ? AddEntity(modify(entity), ids:_*)) flatMap {
@@ -90,7 +92,9 @@ trait CommonDirectives extends BaseFormats {
         }
     }
 
-    def deleteEntity[T: ClassTag](ids: String*)(implicit m: ToEntityMarshaller[T]) = delete {
+    def deleteEntity[T: ClassTag](model: ActorSelection, ids: String*)
+        (implicit m: ToEntityMarshaller[T]) = delete
+    {
         { ctx =>
             (model ? DeleteEntity(ids:_*)) flatMap {
                 case Some(entity: T) => ctx.complete(entity)
