@@ -26,60 +26,60 @@ class Service(val config: Config, val routerDefined: Boolean)
   val modelBlog = context.actorSelection("../" + ModelBlog.name)
   val modelComment = context.actorSelection("../" + ModelComment.name)
 
-  val tickActor: Option[ActorSelection] =
-    if (routerDefined) Some(context.actorSelection("../" + TickActor.name))
-    else None
+  import context.dispatcher
+  implicit val system = context.system
+  implicit val materializer = ActorMaterializer()
 
-    import context.dispatcher
-    implicit val system = context.system
-    implicit val materializer = ActorMaterializer()
+  val bindingFuture = Http().bindAndHandle(route, config.host, config.port)
 
-    val bindingFuture = Http().bindAndHandle(route, config.host, config.port)
-
-    def route = {
-      logger {
-        restartTick {
-          path("") {
-            getFromResource(s"public/html/index.html")
-          } ~
-          path("""([^/]+\.html).*""".r) { path =>
-            getFromResource(s"public/html/$path")
-          } ~
-          pathPrefix("api" / "blogs") {
-            handleBlogs ~
-            handleNewBlogs ~
-            pathPrefix(Segment)(handleBlog)
-          } ~
-          pathPrefix("api") {
-            blogLinks { headComplete }
-          } ~
-          path(Rest) { path =>
-            getFromResource(s"public/$path")
-          }
+  def route = {
+    logger {
+      restartTick {
+        path("") {
+          getFromResource(s"public/html/index.html")
+        } ~
+        path("""([^/]+\.html).*""".r) { path =>
+          getFromResource(s"public/html/$path")
+        } ~
+        pathPrefix("api" / "blogs") {
+          handleBlogs ~
+          handleNewBlogs ~
+          pathPrefix(Segment)(handleBlog)
+        } ~
+        pathPrefix("api") {
+          blogLinks { headComplete }
+        } ~
+        path(Rest) { path =>
+          getFromResource(s"public/$path")
         }
       }
     }
+  }
 
-    def restartTick(route: Route): Route = { requestContext =>
-      tickActor map { _ ! Restart }
-      route(requestContext)
-    }
+  def restartTick(route: Route): Route = {
+    if (routerDefined) {
+      val tickActor = context.actorSelection("../" + TickActor.name)
+      requestContext =>
+        tickActor ! Restart
+        route(requestContext)
+    } else route
+  }
 
-    def logger(route: Route): Route = {
-      if (config.mode == Some("dev")) {
-        requestContext =>
-          val start = System.currentTimeMillis
-          println(requestContext)
-          val result = route(requestContext)
-          val runningTime = System.currentTimeMillis - start
-          println(s"Running time is ${runningTime} ms")
-          result
-      } else route
-    }
+  def logger(route: Route): Route = {
+    if (config.mode == Some("dev")) {
+      requestContext =>
+        val start = System.currentTimeMillis
+        println(requestContext)
+        val result = route(requestContext)
+        val runningTime = System.currentTimeMillis - start
+        println(s"Running time is ${runningTime} ms")
+        result
+    } else route
+  }
 
-    def receive = {
-      case _ =>
-    }
+  def receive = {
+    case _ =>
+  }
 }
 
 object Service {
