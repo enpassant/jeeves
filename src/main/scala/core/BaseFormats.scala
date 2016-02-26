@@ -29,11 +29,11 @@ trait BaseFormats {
   lazy val `application/collection+json` = customMediaTypeUTF8("collection+json")
 
   def customMediaTypeUTF8(name: String): MediaType.WithFixedCharset =
-      MediaType.customWithFixedCharset(
-          "application",
-          name,
-          HttpCharsets.`UTF-8`
-      )
+    MediaType.customWithFixedCharset(
+      "application",
+      name,
+      HttpCharsets.`UTF-8`
+    )
 
   implicit def json4sUnmarshallerMediaType[A: Manifest](mediaType: MediaType)
     (serialization: Serialization, formats: Formats): FromEntityUnmarshaller[A] =
@@ -55,12 +55,16 @@ trait BaseFormats {
       .byteStringUnmarshaller
       .forContentTypes(mediaType)
       .mapWithCharset { (data, charset) =>
-        val input = if (charset == HttpCharsets.`UTF-8`) data.utf8String else data.decodeString(charset.nioCharset.name)
+        val input = if (charset == HttpCharsets.`UTF-8`)
+          data.utf8String
+        else
+          data.decodeString(charset.nioCharset.name)
         serialization.read(input)
       }
 
   implicit def json4sMarshallMediaType[A <: AnyRef](mediaType: MediaType)
-    (serialization: Serialization, formats: Formats, shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False): ToEntityMarshaller[A] =
+    (serialization: Serialization, formats: Formats,
+      shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False): ToEntityMarshaller[A] =
     marshaller(mediaType)(serialization, formats, shouldWritePretty)
 
   //implicit def json4sMarshallerConverter[A <: AnyRef]
@@ -74,10 +78,13 @@ trait BaseFormats {
    * @return marshaller for any `A` value
    */
   implicit def marshaller[A <: AnyRef](mediaType: MediaType)
-    (implicit serialization: Serialization, formats: Formats, shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False): ToEntityMarshaller[A] =
+    (implicit serialization: Serialization, formats: Formats,
+      shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False): ToEntityMarshaller[A] =
     shouldWritePretty match {
-      case ShouldWritePretty.False => Marshaller.StringMarshaller.wrap(mediaType)(serialization.write[A])
-      case _                       => Marshaller.StringMarshaller.wrap(mediaType)(serialization.writePretty[A])
+      case ShouldWritePretty.False =>
+        Marshaller.StringMarshaller.wrap(mediaType)(serialization.write[A])
+      case _ =>
+        Marshaller.StringMarshaller.wrap(mediaType)(serialization.writePretty[A])
     }
 }
 

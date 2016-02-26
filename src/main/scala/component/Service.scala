@@ -19,16 +19,16 @@ import scala.concurrent.duration._
 import org.joda.time.DateTime
 
 class Service(val config: Config, val routerDefined: Boolean)
-    extends Actor
-    with BlogDirectives
-    with ActorLogging
+  extends Actor
+  with BlogDirectives
+  with ActorLogging
 {
-    val modelBlog = context.actorSelection("../" + ModelBlog.name)
-    val modelComment = context.actorSelection("../" + ModelComment.name)
+  val modelBlog = context.actorSelection("../" + ModelBlog.name)
+  val modelComment = context.actorSelection("../" + ModelComment.name)
 
-    val tickActor: Option[ActorSelection] =
-        if (routerDefined) Some(context.actorSelection("../" + TickActor.name))
-        else None
+  val tickActor: Option[ActorSelection] =
+    if (routerDefined) Some(context.actorSelection("../" + TickActor.name))
+    else None
 
     import context.dispatcher
     implicit val system = context.system
@@ -37,53 +37,53 @@ class Service(val config: Config, val routerDefined: Boolean)
     val bindingFuture = Http().bindAndHandle(route, config.host, config.port)
 
     def route = {
-        logger {
-            restartTick {
-                path("") {
-                    getFromResource(s"public/html/index.html")
-                } ~
-                path("""([^/]+\.html).*""".r) { path =>
-                    getFromResource(s"public/html/$path")
-                } ~
-                pathPrefix("api" / "blogs") {
-                    handleBlogs ~
-                    handleNewBlogs ~
-                    pathPrefix(Segment)(handleBlog)
-                } ~
-                pathPrefix("api") {
-                    blogLinks { headComplete }
-                } ~
-                path(Rest) { path =>
-                    getFromResource(s"public/$path")
-                }
-            }
+      logger {
+        restartTick {
+          path("") {
+            getFromResource(s"public/html/index.html")
+          } ~
+          path("""([^/]+\.html).*""".r) { path =>
+            getFromResource(s"public/html/$path")
+          } ~
+          pathPrefix("api" / "blogs") {
+            handleBlogs ~
+            handleNewBlogs ~
+            pathPrefix(Segment)(handleBlog)
+          } ~
+          pathPrefix("api") {
+            blogLinks { headComplete }
+          } ~
+          path(Rest) { path =>
+            getFromResource(s"public/$path")
+          }
         }
+      }
     }
 
     def restartTick(route: Route): Route = { requestContext =>
-        tickActor map { _ ! Restart }
-        route(requestContext)
+      tickActor map { _ ! Restart }
+      route(requestContext)
     }
 
     def logger(route: Route): Route = {
-        if (config.mode == Some("dev")) {
-            requestContext =>
-                val start = System.currentTimeMillis
-                println(requestContext)
-                val result = route(requestContext)
-                val runningTime = System.currentTimeMillis - start
-                println(s"Running time is ${runningTime} ms")
-                result
-        } else route
+      if (config.mode == Some("dev")) {
+        requestContext =>
+          val start = System.currentTimeMillis
+          println(requestContext)
+          val result = route(requestContext)
+          val runningTime = System.currentTimeMillis - start
+          println(s"Running time is ${runningTime} ms")
+          result
+      } else route
     }
 
     def receive = {
-        case _ =>
+      case _ =>
     }
 }
 
 object Service {
-    def props(config: Config, routerDefined: Boolean) =
-        Props(new Service(config, routerDefined))
-    def name = "service"
+  def props(config: Config, routerDefined: Boolean) =
+    Props(new Service(config, routerDefined))
+  def name = "service"
 }
