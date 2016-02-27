@@ -28,4 +28,3 @@ trait UserFormats extends BaseFormats {
   implicit val SeqUserMarshaller = marshaller[Seq[User]](
     MediaTypes.`application/json`)
 }
-
