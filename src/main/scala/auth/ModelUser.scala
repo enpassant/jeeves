@@ -18,6 +18,10 @@ class ModelUser(val mode: Option[String]) extends Actor {
   def receive: Receive = process(tableUser)
 
   def process(tableUser: List[User]): Receive = {
+    case Login(name, password) =>
+      sender ! tableUser.find { user =>
+        user.login == Option(name) && user.password == Option(password)
+      }
     case GetEntity(uuid) =>
       sender ! tableUser.find(_.id == uuid.toString)
     case ListWithOffset(User, _, offset, limit) =>

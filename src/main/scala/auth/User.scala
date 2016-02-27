@@ -13,9 +13,14 @@ case class User(id: String = null, name: Option[String] = None,
   login: Option[String] = None, password: Option[String] = None,
   rolesets: List[Roleset] = List())
 
+case class Login(name: String, password: String)
+
 trait UserFormats extends BaseFormats {
   lazy val `application/vnd.enpassant.user+json` =
     customMediaTypeUTF8("vnd.enpassant.user+json")
+
+  lazy val `application/vnd.enpassant.login+json` =
+    customMediaTypeUTF8("vnd.enpassant.login+json")
 
   implicit val UserUnmarshaller = Unmarshaller.firstOf(
     unmarshaller[User](`application/vnd.enpassant.user+json`),
@@ -27,4 +32,12 @@ trait UserFormats extends BaseFormats {
 
   implicit val SeqUserMarshaller = marshaller[Seq[User]](
     MediaTypes.`application/json`)
+
+  implicit val LoginUnmarshaller = Unmarshaller.firstOf(
+    unmarshaller[Login](`application/vnd.enpassant.login+json`),
+    unmarshaller[Login](MediaTypes.`application/json`))
+
+  implicit val LoginMarshaller = Marshaller.oneOf(
+    marshaller[Login](`application/vnd.enpassant.login+json`),
+    marshaller[Login](MediaTypes.`application/json`))
 }

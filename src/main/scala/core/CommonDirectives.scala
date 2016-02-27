@@ -5,7 +5,7 @@ import component._
 import akka.actor.ActorSelection
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
-import akka.http.scaladsl.model.{HttpHeader, HttpMethod, MediaType, MediaTypes, Uri}
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Accept, Link, LinkParams, LinkValue, RawHeader}
 import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
@@ -97,6 +97,7 @@ trait CommonDirectives extends BaseFormats {
       entity(as[T]) { entity => ctx =>
         (model ? AddEntity(entity, ids:_*)) flatMap {
           case entity: U => ctx.complete(entity)
+          case _ => ctx.complete(StatusCodes.Unauthorized)
         }
       }
     }
