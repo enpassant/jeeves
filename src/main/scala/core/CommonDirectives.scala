@@ -92,6 +92,15 @@ trait CommonDirectives extends BaseFormats {
       }
     }
 
+  def postEntity[T: ClassTag, U: ClassTag](model: ActorSelection, ids: String*)
+    (implicit u: FromRequestUnmarshaller[T], m: ToEntityMarshaller[U]) = post {
+      entity(as[T]) { entity => ctx =>
+        (model ? AddEntity(entity, ids:_*)) flatMap {
+          case entity: U => ctx.complete(entity)
+        }
+      }
+    }
+
   def deleteEntity[T: ClassTag](model: ActorSelection, ids: String*)
     (implicit m: ToEntityMarshaller[T]) = delete
   {

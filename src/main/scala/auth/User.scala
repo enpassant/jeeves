@@ -9,7 +9,9 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
 
-case class User(id: String = null, name: String, rolesets: List[Roleset] = List())
+case class User(id: String = null, name: Option[String] = None,
+  login: Option[String] = None, password: Option[String] = None,
+  rolesets: List[Roleset] = List())
 
 trait UserFormats extends BaseFormats {
   lazy val `application/vnd.enpassant.user+json` =

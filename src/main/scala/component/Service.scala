@@ -21,10 +21,12 @@ import org.joda.time.DateTime
 class Service(val config: Config, val routerDefined: Boolean)
   extends Actor
   with BlogDirectives
+  with TokenDirectives
   with ActorLogging
 {
   val modelBlog = context.actorSelection("../" + ModelBlog.name)
   val modelComment = context.actorSelection("../" + ModelComment.name)
+  val modelToken = context.actorSelection("../" + ModelToken.name)
 
   import context.dispatcher
   implicit val system = context.system
@@ -41,13 +43,17 @@ class Service(val config: Config, val routerDefined: Boolean)
         path("""([^/]+\.html).*""".r) { path =>
           getFromResource(s"public/html/$path")
         } ~
+        pathPrefix("api") {
+          blogLinks { headComplete }
+          tokenLinks { headComplete }
+        } ~
         pathPrefix("api" / "blogs") {
           handleBlogs ~
           handleNewBlogs ~
           pathPrefix(Segment)(handleBlog)
         } ~
-        pathPrefix("api") {
-          blogLinks { headComplete }
+        pathPrefix("api" / "tokens") {
+          handleTokens
         } ~
         path(Rest) { path =>
           getFromResource(s"public/$path")
