@@ -2,7 +2,7 @@ define(['./model', 'menu', 'base/localization', 'base/request', 'jquery',
     'semantic', 'mithril'], function (model, menu, loc, req, $)
 {
     var deleteItem = function(href) {
-        return function(elem) { 
+        return function(elem) {
             var $dialog = $('.ui.modal.delete');
             $dialog.modal({
                 onApprove : function() {
@@ -18,7 +18,7 @@ define(['./model', 'menu', 'base/localization', 'base/request', 'jquery',
     };
 
     model.view = function() {
-        var page = menu.vm.pages()[0];
+        var page = menu.vm.getPage("self");
         var columns = menu.vm.getColumns(page);
         var columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(column.name));

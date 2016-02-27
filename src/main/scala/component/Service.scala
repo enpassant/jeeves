@@ -47,12 +47,16 @@ class Service(val config: Config, val routerDefined: Boolean)
           (blogLinks & tokenLinks) { headComplete }
         } ~
         pathPrefix("api" / "blogs") {
-          handleBlogs ~
-          handleNewBlogs ~
-          pathPrefix(Segment)(handleBlog)
+          tokenLinks {
+            handleBlogs ~
+            handleNewBlogs ~
+            pathPrefix(Segment)(handleBlog)
+          }
         } ~
         pathPrefix("api" / "tokens") {
-          handleTokens
+          (blogLinks & tokenLinks) {
+            handleTokens
+          }
         } ~
         path(Rest) { path =>
           getFromResource(s"public/$path")

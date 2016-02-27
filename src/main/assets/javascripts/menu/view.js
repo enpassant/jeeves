@@ -1,14 +1,26 @@
-define(['./model', 'base/localization', 'base/request', 'mithril'], function (model, loc, req) {
+define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
+     function (model, loc, req, Cookies)
+ {
+    var loadUser = function(userId) {
+        var page = model.vm.getPage("user");
+        req.send({url: "/api" + page.url, method: "GET"},
+            model.vm.pages).then(function(user) {
+                console.log(user);
+                Cookies.set("user", user.name);
+        });
+    };
+
     var login = function(name, password) {
-        return function(elem) { 
+        return function(elem) {
             var page = model.vm.getPage("login");
-            var href = model.vm.getHref(page, "POST");
-            m.startComputation();
             var login = { name: name, password: password };
             req.send({url: "/api" + page.url, method: "POST", data: login},
-                 model.vm.pages).then(function() {
+                model.vm.pages).then(function(token) {
+                    console.log(token);
+                    Cookies.set("tokenId", token.id);
+                    Cookies.set("userId", token.userId);
+                    loadUser(userId);
             });
-            m.endComputation();
         };
     };
 
@@ -30,7 +42,7 @@ define(['./model', 'base/localization', 'base/request', 'mithril'], function (mo
                     m("a.item", {onclick: login("john", "john123")}, "John"),
                     m("a.item", {onclick: login("fred", "fred123")}, "Fred")
                 ])
-            ])
+            ]),
         ]);
         return m("div.ui.menu.inverted.stackable", menuItems.concat(rightMenu));
     };
