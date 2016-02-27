@@ -23,12 +23,11 @@ trait TokenDirectives extends CommentDirectives
   def handleTokens = pathEnd {
     headComplete ~
     postEntity[Login, Token](modelToken)
+  } ~
+  path(Segment) { tokenId =>
+    getEntity[Token](modelToken, tokenId) ~
+    deleteEntity[Token](modelToken, tokenId)
   }
-
-  def tokenItemLink(rel: String, tokenId: String = ":tokenId",
-    methods: List[HttpMethod] = List(GET)) =
-    mtLink(s"/tokens/$tokenId", rel, `application/vnd.enpassant.token+json`,
-      methods:_*)
 
   def tokenLinks = respondWithLinks(
     mtLink("/tokens", "login", `application/vnd.enpassant.token+json`, POST),
