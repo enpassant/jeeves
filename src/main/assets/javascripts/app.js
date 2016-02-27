@@ -3,15 +3,6 @@ define(['menu', 'collection', 'blog', 'base/request', 'base/localization'],
 {
     var restUri = "/api";
 
-    var appMenu = {
-        controller: function() {
-            menu.load(restUri + '/');
-        },
-        view: function() {
-            return m.component(menu);
-        }
-    };
-
     var app = {};
 
     app.getFullUri = function(uri) {
@@ -43,7 +34,7 @@ define(['menu', 'collection', 'blog', 'base/request', 'base/localization'],
         var componentUi = (component) ?
             m("div.ui.segment", [
                 m.component(component, ctrl)
-            ]) : "Missing component";
+            ]) : "";
 
         return m("div", [
             m.component(menu),
@@ -52,7 +43,7 @@ define(['menu', 'collection', 'blog', 'base/request', 'base/localization'],
     };
 
     m.route(document.body, "/", {
-        "/": appMenu,
+        "/": app,
         "/:componentName": app
     });
 

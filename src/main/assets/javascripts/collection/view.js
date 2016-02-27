@@ -59,7 +59,7 @@ define(['./model', 'menu', 'base/localization', 'base/request', 'jquery',
                         href = menu.vm.getHref(page, "DELETE");
                         if (href) {
                             href =("/api" + page.url).replace(/:[a-zA-Z0-9]+/, id);
-                            operations.push(m("a", {href: "#", onclick: deleteItem(href)},
+                            operations.push(m("a.clickable", {onclick: deleteItem(href)},
                                 m("i.trash.outline.icon")));
                         }
                         columnValueUI.push(m("td", operations));

@@ -70,4 +70,4 @@ WebKeys.packagePrefix in Assets := "public/"
 
 RjsKeys.optimize := "none"
 
-pipelineStages := Seq(rjs)
+//pipelineStages := Seq(rjs)

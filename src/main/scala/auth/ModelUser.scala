@@ -12,7 +12,7 @@ class ModelUser(val mode: Option[String]) extends Actor {
   val tableUser = List(
     User(UUID.randomUUID.toString, Some("Jim"), Some("jim"), Some("jim123"), List()),
     User(UUID.randomUUID.toString, Some("John"), Some("john"), Some("john123"), List()),
-    User(UUID.randomUUID.toString, Some("Fred"), Some("Fred"), Some("fred123"), List())
+    User(UUID.randomUUID.toString, Some("Fred"), Some("fred"), Some("fred123"), List())
   )
 
   def receive: Receive = process(tableUser)

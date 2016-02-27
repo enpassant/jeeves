@@ -44,8 +44,7 @@ class Service(val config: Config, val routerDefined: Boolean)
           getFromResource(s"public/html/$path")
         } ~
         pathPrefix("api") {
-          blogLinks { headComplete }
-          tokenLinks { headComplete }
+          (blogLinks & tokenLinks) { headComplete }
         } ~
         pathPrefix("api" / "blogs") {
           handleBlogs ~
