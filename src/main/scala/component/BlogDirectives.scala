@@ -6,14 +6,18 @@ import akka.actor.ActorSelection
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.headers.Accept
-import akka.http.scaladsl.server.{Route, RouteResult}
+import akka.http.scaladsl.server.{Directive1, Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
+import akka.pattern.ask
 import java.util.UUID
 import org.joda.time.DateTime
+import scala.concurrent.Future
 
 trait BlogDirectives extends CommentDirectives
   with CommonDirectives with BlogFormats with CommentFormats
 {
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   def modelBlog: ActorSelection
 
   def handleBlogs = pathEnd {
@@ -30,28 +34,46 @@ trait BlogDirectives extends CommentDirectives
   def handleNewBlogs = path("new") {
     get {
       val uuid = UUID.randomUUID.toString
-      respondWithLinks(blogItemLink("self", uuid, methods = List(GET, PUT))) {
+      respondWithLinks(blogItemLink("self", uuid, methods = List(PUT))) {
         complete(Blog(uuid, "john", DateTime.now, "", ""))
       }
     }
   }
 
   def handleBlog(blogId: String) = pathEnd {
-    respondWithLinks(
-      blogListLink("blogs"),
-      blogItemLink("self", blogId, methods = List(GET, PUT, DELETE)),
-      commentListLink(blogId, "comments", GET),
-      commentItemLink(blogId, "new", PUT))
-      {
-        headComplete ~
-        getEntity[Blog](modelBlog, blogId) ~
-        putEntity[Blog](modelBlog, _.copy(id = blogId), blogId) ~
-        deleteEntity[Blog](modelBlog, blogId)
+    getBlogDirective(blogId) {
+      case Some(blog: Blog) => {
+        respondBlogLinks(blogId, GET, PUT, DELETE) {
+          headComplete ~
+          getEntity[Blog](modelBlog, blogId) ~
+          putEntity[Blog](modelBlog, _.copy(id = blogId), blogId) ~
+          deleteEntity[Blog](modelBlog, blogId)
+        }
       }
+      case None =>
+        respondBlogLinks(blogId, PUT) {
+          headComplete ~
+          putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
+        }
+    }
   } ~
   pathPrefix("comments") {
     blogLinks { handleComments(blogId) } ~
     pathPrefix(Segment)(handleComment(blogId) _)
+  }
+
+  def respondBlogLinks(blogId: String, methods: HttpMethod*) = respondWithLinks(
+      blogListLink("blogs"),
+      blogItemLink("self", blogId, methods.toList),
+      commentListLink(blogId, "comments", GET),
+      commentItemLink(blogId, "new", GET)
+  )
+
+  def getBlogDirective(blogId: String): Directive1[Option[Blog]] = {
+    onSuccess(modelBlog ? GetEntity(blogId)) flatMap {
+      case Some(blog: Blog) => provide(Some(blog))
+      case None => provide(None)
+    }
   }
 
   def blogListLink(rel: String, methods: List[HttpMethod] = List(GET)) =
