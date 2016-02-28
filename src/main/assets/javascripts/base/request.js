@@ -5,12 +5,12 @@ define(['cookie', 'mithril'], function (Cookies) {
 
     req.head = function(params, linkVar) {
         params.method = 'HEAD';
-        params.extract = req.extract(linkVar);
+        if (linkVar) params.extract = req.extract(linkVar);
         return m.request(params);
     };
 
     req.send = function(params, linkVar) {
-        params.extract = req.extract(linkVar);
+        if (linkVar) params.extract = req.extract(linkVar);
         return m.request(params);
     };
 

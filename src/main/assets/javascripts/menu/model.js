@@ -42,5 +42,13 @@ define(['base/request', 'mithril'], function (req) {
         req.head({url: url}, model.vm.pages);
     };
 
+    model.loginComponent = {};
+
+    model.loggedInComponent = {};
+
+    model.vm.loginComponent = m.prop(model.loginComponent);
+
+    model.vm.loggedInUser = m.prop("");
+
     return model;
 });
