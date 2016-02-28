@@ -15,16 +15,14 @@ define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
     };
 
     var loadUser = function(userId) {
-        model.vm.loggedInUser(userId);
-        model.vm.loginComponent(model.loggedInComponent);
-
         var page = model.vm.getPage("user");
         if (page) {
             var url = "/api" + page.url.replace(/:[a-zA-Z0-9]+/, userId);
-            req.send({url: url, method: "GET"},
-                model.vm.pages).then(function(user) {
-                    console.log(user);
+            req.send({url: url, method: "GET"}, undefined).then(
+                function(user) {
                     Cookies.set("user", user.name);
+                    model.vm.loggedInUser(user.name);
+                    model.vm.loginComponent(model.loggedInComponent);
             });
         }
     };

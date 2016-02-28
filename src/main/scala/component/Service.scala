@@ -22,11 +22,13 @@ class Service(val config: Config, val routerDefined: Boolean)
   extends Actor
   with BlogDirectives
   with TokenDirectives
+  with UserDirectives
   with ActorLogging
 {
   val modelBlog = context.actorSelection("../" + ModelBlog.name)
   val modelComment = context.actorSelection("../" + ModelComment.name)
   val modelToken = context.actorSelection("../" + ModelToken.name)
+  val modelUser = context.actorSelection("../" + ModelUser.name)
 
   import context.dispatcher
   implicit val system = context.system
@@ -44,18 +46,22 @@ class Service(val config: Config, val routerDefined: Boolean)
           getFromResource(s"public/html/$path")
         } ~
         pathPrefix("api") {
-          (blogLinks & tokenLinks) { headComplete }
-        } ~
-        pathPrefix("api" / "blogs") {
-          tokenLinks {
-            handleBlogs ~
-            handleNewBlogs ~
-            pathPrefix(Segment)(handleBlog)
-          }
-        } ~
-        pathPrefix("api" / "tokens") {
-          (blogLinks & tokenLinks) {
-            handleTokens
+          (blogLinks & tokenLinks & userMenuLinks & userItemLinks) {
+            headComplete
+          } ~
+          (tokenLinks & userItemLinks) {
+            pathPrefix("blogs") {
+              handleBlogs ~
+              handleNewBlogs ~
+              pathPrefix(Segment)(handleBlog)
+            } ~
+            pathPrefix("tokens") {
+              handleTokens
+            } ~
+            pathPrefix("users") {
+              handleUsers ~
+              pathPrefix(Segment)(handleUser)
+            }
           }
         } ~
         path(Rest) { path =>
