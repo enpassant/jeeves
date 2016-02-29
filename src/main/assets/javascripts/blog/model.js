@@ -31,9 +31,9 @@ define(['menu', 'base/request', 'mithril'], function (menu, req) {
         model.vm.blog = m.prop({});
 
         if (url.contains(':')) {
-            req.head({url: url}, menu.vm.pages);
+            return req.head({url: url}, menu.vm.pages);
         } else {
-            req.send({method: "GET", url: url}, menu.vm.pages).then(model.setBlog);
+            return req.send({method: "GET", url: url}, menu.vm.pages).then(model.setBlog);
         }
     };
 

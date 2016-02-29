@@ -26,8 +26,8 @@ define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
 
     model.loginComponent.view = function(ctrl, args) {
         return m("div.right.menu", [
-            m("div.ui.dropdown.item", {config: function() {
-                $('.ui.dropdown').dropdown();
+            m("div.ui.dropdown.item", {config: function(elem) {
+                $(elem).dropdown();
             }}, [
                 "Login", m("i.dropdown.icon"), m("div.menu", [
                     m("a.item", {onclick: login("jim", "jim123")}, "Jim"),

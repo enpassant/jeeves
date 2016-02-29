@@ -4,8 +4,8 @@ define(['./model', 'menu', 'base/localization', 'mithril'], function (model, men
         var editable = true ? "[contenteditable=true]" : "";
         return m("div.ui.card", [
             m("div.content", [
-                m("div.header#blog-title" + editable, {config: function() {
-                    document.getElementById('blog-title').focus();
+                m("div.header#blog-title" + editable, {config: function(elem) {
+                    elem.focus();
                 }}, ctrl.blog().title),
                 m("div.meta", [
                     "by " + ctrl.blog().accountId, m("span.right.floated", date)
