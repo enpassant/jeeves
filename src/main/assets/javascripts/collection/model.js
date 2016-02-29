@@ -9,7 +9,7 @@ define(['menu', 'base/request', 'mithril'], function (menu, req) {
     };
 
     model.load = function(url) {
-        req.send({method: "GET", url: url}, menu.vm.pages).then(model.vm.rows);
+        return req.send({method: "GET", url: url}, menu.vm.pages).then(model.vm.rows);
     };
 
     return model;

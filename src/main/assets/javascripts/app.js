@@ -15,10 +15,10 @@ define(['menu', 'collection', 'blog', 'base/request', 'base/localization'],
         if (params.path) {
             if (params.componentName && components[params.componentName]) {
                 this.component = components[params.componentName];
-                this.component.load(restUri + params.path);
+                this.component.load(restUri + params.path).then(menu.initToken);
             }
         } else {
-            menu.load(restUri + '/');
+            menu.load(restUri + '/').then(menu.initToken);
         }
         return this;
     };

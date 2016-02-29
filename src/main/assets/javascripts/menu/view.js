@@ -1,6 +1,6 @@
 define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
      function (model, loc, req, Cookies)
- {
+{
     var login = function(name, password) {
         return function(elem) {
             var page = model.vm.getPage("login");
@@ -8,23 +8,9 @@ define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
             req.send({url: "/api" + page.url, method: "POST", data: login}, undefined).then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
-                    Cookies.set("userId", token.userId);
-                    loadUser(token.userId);
+                    model.loadUser(token.userId);
                 });
         };
-    };
-
-    var loadUser = function(userId) {
-        var page = model.vm.getPage("user");
-        if (page) {
-            var url = "/api" + page.url.replace(/:[a-zA-Z0-9]+/, userId);
-            req.send({url: url, method: "GET"}, undefined).then(
-                function(user) {
-                    Cookies.set("user", user.name);
-                    model.vm.loggedInUser(user.name);
-                    model.vm.loginComponent(model.loggedInComponent);
-            });
-        }
     };
 
     var logout = function() {
@@ -33,7 +19,6 @@ define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
         req.send({url: url, method: "DELETE"}, undefined).then(
             function(token) {
                 Cookies.remove("tokenId");
-                Cookies.remove("userId");
                 model.vm.loginComponent(model.loginComponent);
                 model.vm.loggedInUser("");
             });
