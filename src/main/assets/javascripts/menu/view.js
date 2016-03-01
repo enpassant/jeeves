@@ -1,11 +1,11 @@
-define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
-     function (model, loc, req, Cookies)
+define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', 'mithril'],
+     function (model, app, loc, req, Cookies)
 {
     var login = function(name, password) {
         return function(elem) {
             var page = model.vm.getPage("login");
             var login = { name: name, password: password };
-            req.send({url: "/api" + page.url, method: "POST", data: login}, undefined).then(
+            req.send({url: app.fullUri(page.url), method: "POST", data: login}, undefined).then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
                     model.loadUser(token.userId);
@@ -15,7 +15,7 @@ define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
 
     var logout = function() {
         var page = model.vm.getPage("token");
-        var url = "/api" + page.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId"));
+        var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId")));
         req.send({url: url, method: "DELETE"}, undefined).then(
             function(token) {
                 Cookies.remove("tokenId");

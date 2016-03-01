@@ -1,4 +1,4 @@
-define(['base/request', 'mithril'], function (req) {
+define(['base/request', 'app/model', 'mithril'], function (req, app) {
     var model = {};
 
     model.restUri = m.prop("/api");

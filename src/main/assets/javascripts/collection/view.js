@@ -1,5 +1,5 @@
-define(['./model', 'menu', 'base/localization', 'base/request', 'jquery',
-    'semantic', 'mithril'], function (model, menu, loc, req, $)
+define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jquery',
+    'semantic', 'mithril'], function (model, app, menu, loc, req, $)
 {
     var deleteItem = function(href) {
         return function(elem) {
@@ -9,7 +9,7 @@ define(['./model', 'menu', 'base/localization', 'base/request', 'jquery',
                     m.startComputation();
                     var params = m.route.param();
                     req.send({url: href, method: "DELETE"}, menu.vm.pages).then(function() {
-                        model.load("/api" + params.path);
+                        model.load(app.fullUri(params.path));
                     });
                     m.endComputation();
                 }
@@ -58,7 +58,7 @@ define(['./model', 'menu', 'base/localization', 'base/request', 'jquery',
                         }
                         href = menu.vm.getHref(page, "DELETE");
                         if (href) {
-                            href =("/api" + page.url).replace(/:[a-zA-Z0-9]+/, id);
+                            href =(app.fullUri(page.url)).replace(/:[a-zA-Z0-9]+/, id);
                             operations.push(m("a.clickable", {onclick: deleteItem(href)},
                                 m("i.trash.outline.icon")));
                         }

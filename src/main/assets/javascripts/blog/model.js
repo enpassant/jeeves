@@ -1,4 +1,4 @@
-define(['menu', 'base/request', 'mithril'], function (menu, req) {
+define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, req) {
     var model = {};
 
     model.blog = {};
@@ -14,7 +14,7 @@ define(['menu', 'base/request', 'mithril'], function (menu, req) {
 
     model.vm.send = function() {
         var page = menu.vm.getPage("self");
-        var url = "/api" + page.url;
+        var url = app.fullUri(page.url);
         console.log(url);
         var blog = model.vm.blog();
         blog.title = $('#blog-title').text();

@@ -1,4 +1,4 @@
-define(['base/request', 'cookie', 'mithril'], function (req, Cookies) {
+define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, Cookies) {
     var model = {};
 
     model.vm = {};
@@ -65,7 +65,7 @@ define(['base/request', 'cookie', 'mithril'], function (req, Cookies) {
     model.loadUser = function(userId) {
         var page = model.vm.getPage("user");
         if (page) {
-            var url = "/api" + page.url.replace(/:[a-zA-Z0-9]+/, userId);
+            var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, userId));
             req.send({url: url, method: "GET"}, undefined).then(
                 function(user) {
                     model.vm.loggedInUser(user.name);
@@ -77,7 +77,7 @@ define(['base/request', 'cookie', 'mithril'], function (req, Cookies) {
     model.loadToken = function(tokenId) {
         var page = model.vm.getPage("token");
         if (page) {
-            var url = "/api" + page.url.replace(/:[a-zA-Z0-9]+/, tokenId);
+            var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, tokenId));
             return req.send({url: url, method: "GET"}, undefined).then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
