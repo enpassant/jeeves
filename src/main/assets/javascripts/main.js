@@ -7,7 +7,7 @@
         keepBuildDir: "true",
         packages: ['menu', 'collection', 'blog'],
         paths: {
-            'mithril': '../third/mithril/mithril.min',
+            'mithril': '../third/mithril/mithril',
             'mithril-translate': '../third/mithril-translate/mithril-translate.min',
             'semantic': '../third/semantic/semantic.min',
             'jquery': '../third/jquery/jquery-1.12.0.min',

@@ -31,13 +31,20 @@ define(['cookie', 'mithril'], function (Cookies) {
 
     req.extract = function(linkVar) {
         return function(xhr, xhrOptions) {
-            var links = xhr.getResponseHeader("Link").split(",");
-            if (links) {
-                var linkObjs = links.map(parseLink);
-                linkVar(linkObjs);
+            if (xhr.status >= 400) {
+                throw xhr;
             }
-            var resp = xhr.responseText;
-            if (resp) return resp;
+            try {
+                var links = xhr.getResponseHeader("Link").split(",");
+                if (links) {
+                    var linkObjs = links.map(parseLink);
+                    linkVar(linkObjs);
+                }
+                var resp = xhr.responseText;
+                if (resp) return resp;
+            } catch(e) {
+                console.log(e);
+            }
             return "{}";
         };
     };

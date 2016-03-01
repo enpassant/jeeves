@@ -32,6 +32,7 @@ define(['./model', 'base/localization', 'base/request', 'cookie', 'mithril'],
                 "Login", m("i.dropdown.icon"), m("div.menu", [
                     m("a.item", {onclick: login("jim", "jim123")}, "Jim"),
                     m("a.item", {onclick: login("john", "john123")}, "John"),
+                    m("a.item", {onclick: login("john", "john")}, "John with wrong password"),
                     m("a.item", {onclick: login("fred", "fred123")}, "Fred")
                 ])
             ]),
