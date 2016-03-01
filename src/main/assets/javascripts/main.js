@@ -5,7 +5,7 @@
         optimize: "none",
         skipDirOptimize: "true",
         keepBuildDir: "true",
-        packages: ['menu', 'collection', 'blog'],
+        packages: ['app', 'menu', 'collection', 'blog'],
         paths: {
             'mithril': '../third/mithril/mithril',
             'mithril-translate': '../third/mithril-translate/mithril-translate.min',
@@ -35,6 +35,6 @@
         console.log(err);
     };
 
-    require(['jquery', 'app'], function ($, app) {
+    require(['jquery', 'semantic', 'app'], function ($, semantic, app) {
     });
 })(requirejs);
