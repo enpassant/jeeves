@@ -9,7 +9,8 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
                 function(token) {
                     Cookies.set("tokenId", token.id);
                     model.loadUser(token.userId);
-                });
+                },
+                app.errorHandler(model));
         };
     };
 

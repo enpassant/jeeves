@@ -70,7 +70,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
                 function(user) {
                     model.vm.loggedInUser(user.name);
                     model.vm.loginComponent(model.loggedInComponent);
-            });
+            }, app.errorHandler(model, "Load logged in user data", model.removeToken));
         }
     };
 
@@ -82,9 +82,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
                 function(token) {
                     Cookies.set("tokenId", token.id);
                     model.loadUser(token.userId);
-                }, function() {
-                    model.removeToken();
-                }
+                }, app.errorHandler(model, "Load logged in user data", model.removeToken)
             );
         }
     };

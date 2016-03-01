@@ -3,17 +3,6 @@ define(['cookie', 'mithril'], function (Cookies) {
 
     var req = {};
 
-    req.head = function(params, linkVar) {
-        params.method = 'HEAD';
-        if (linkVar) params.extract = req.extract(linkVar);
-        return m.request(params);
-    };
-
-    req.send = function(params, linkVar) {
-        if (linkVar) params.extract = req.extract(linkVar);
-        return m.request(params);
-    };
-
     var parseLink = function(link) {
         var linkArr = link.trim().split(";");
         var linkObj = {};
@@ -29,7 +18,14 @@ define(['cookie', 'mithril'], function (Cookies) {
         return linkObj;
     };
 
-    req.extract = function(linkVar) {
+    var baseExtract = function(xhr, xhrOptions) {
+        if (xhr.status >= 400) {
+            throw xhr;
+        }
+        return xhr.response;
+    };
+
+    var extract = function(linkVar) {
         return function(xhr, xhrOptions) {
             if (xhr.status >= 400) {
                 throw xhr;
@@ -47,6 +43,17 @@ define(['cookie', 'mithril'], function (Cookies) {
             }
             return "{}";
         };
+    };
+
+    req.head = function(params, linkVar) {
+        params.method = 'HEAD';
+        params.extract = linkVar ? extract(linkVar) : baseExtract;
+        return m.request(params);
+    };
+
+    req.send = function(params, linkVar) {
+        params.extract = linkVar ? extract(linkVar) : baseExtract;
+        return m.request(params);
     };
 
     return req;

@@ -6,10 +6,10 @@ define(['./model', 'menu', 'collection', 'blog'], function (model, menu, collect
             if (params.componentName && components[params.componentName]) {
                 this.component = components[params.componentName];
                 this.component.load(model.fullUri(params.path)).then(
-                    menu.initToken, model.errorHandler);
+                    menu.initToken, model.errorHandler(menu));
             }
         } else {
-            menu.load(model.fullUri('/')).then(menu.initToken, model.errorHandler);
+            menu.load(model.fullUri('/')).then(menu.initToken, model.errorHandler(menu));
         }
 
         return this;
