@@ -83,7 +83,7 @@ class Service(val config: Config, val routerDefined: Boolean)
 
   def restartTick(route: Route): Route = {
     if (routerDefined) {
-      val tickActor = context.actorSelection("../" + TickActor.name)
+      val tickActor = Supervisor.getChild(TickActor.name)
       requestContext =>
         tickActor ! Restart
         route(requestContext)
