@@ -34,7 +34,9 @@ trait BlogDirectives extends CommentDirectives
       headComplete ~
       getList[Blog](modelBlog, Blog)()
     }
-  }
+  } ~
+  handleNewBlogs(optUser) ~
+  pathPrefix(Segment)(handleBlog(optUser))
 
   def handleNewBlogs(optUser: Option[User]) = path("new") {
     get {

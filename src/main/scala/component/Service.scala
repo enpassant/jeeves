@@ -53,9 +53,7 @@ class Service(val config: Config, val routerDefined: Boolean)
               } ~
               (tokenLinks & userItemLinks) {
                 pathPrefix("blogs") {
-                  handleBlogs(optUser) ~
-                  handleNewBlogs(optUser) ~
-                  pathPrefix(Segment)(handleBlog(optUser))
+                  handleBlogs(optUser)
                 } ~
                 pathPrefix("tokens") {
                   handleTokens
