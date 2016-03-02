@@ -46,21 +46,25 @@ class Service(val config: Config, val routerDefined: Boolean)
           getFromResource(s"public/html/$path")
         } ~
         pathPrefix("api") {
-          (blogLinks & tokenLinks & userMenuLinks & userItemLinks) {
-            headComplete
-          } ~
-          (tokenLinks & userItemLinks) {
-            pathPrefix("blogs") {
-              handleBlogs ~
-              handleNewBlogs ~
-              pathPrefix(Segment)(handleBlog)
-            } ~
-            pathPrefix("tokens") {
-              handleTokens
-            } ~
-            pathPrefix("users") {
-              handleUsers ~
-              pathPrefix(Segment)(handleUser)
+          optionalToken { token =>
+            optionalUser(token) { user =>
+              (blogLinks & tokenLinks & userMenuLinks & userItemLinks) {
+                headComplete
+              } ~
+              (tokenLinks & userItemLinks) {
+                pathPrefix("blogs") {
+                  handleBlogs ~
+                  handleNewBlogs ~
+                  pathPrefix(Segment)(handleBlog)
+                } ~
+                pathPrefix("tokens") {
+                  handleTokens
+                } ~
+                pathPrefix("users") {
+                  handleUsers ~
+                  pathPrefix(Segment)(handleUser)
+                }
+              }
             }
           }
         } ~
@@ -69,6 +73,18 @@ class Service(val config: Config, val routerDefined: Boolean)
         }
       }
     }
+  }
+
+  def optionalUser(token: Option[Token])(route: Option[User] => Route): Route = {
+    val user = token match {
+      case Some(t) =>
+        (modelUser ? GetEntity[User](t.userId)) map {
+          case Some(user: User) => Some(user)
+          case _ => None
+        }
+      case _ => Future(None)
+    }
+    ctx => user flatMap ( u => route(u)(ctx) )
   }
 
   def restartTick(route: Route): Route = {

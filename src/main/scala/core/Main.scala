@@ -8,8 +8,6 @@ case class Config(host: String = "localhost", port: Int = 9000,
     router: Option[String] = None, mode: Option[String] = None)
 
 object Main extends App {
-  val actorSystem = ActorSystem("james")
-
   val parser = new scopt.OptionParser[Config]("james") {
     head("james", "1.0")
     opt[String]('h', "host") action { (x, c) =>
@@ -25,7 +23,7 @@ object Main extends App {
   // parser.parse returns Option[C]
   parser.parse(args, Config()) match {
     case Some(config) =>
-      val superVisor = actorSystem.actorOf(Supervisor.props(config), Supervisor.name)
+      val superVisor = Supervisor.actorSystem.actorOf(Supervisor.props(config), Supervisor.name)
     case None =>
   }
 }

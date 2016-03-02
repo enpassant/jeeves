@@ -20,6 +20,15 @@ trait TokenDirectives extends CommentDirectives
 
   def modelToken: ActorSelection
 
+  def optionalToken: Directive1[Option[Token]] = optionalCookie("tokenId") flatMap {
+    case Some(tokenId) =>
+      onSuccess((modelToken ? GetEntity[Token](tokenId.value))) flatMap {
+        case Some(token: Token) => provide(Some(token))
+        case _ => provide(None)
+      }
+    case None => provide(None)
+  }
+
   def handleTokens = pathEnd {
     headComplete ~
     postEntity[Login, Token](modelToken)

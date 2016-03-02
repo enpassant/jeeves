@@ -12,7 +12,7 @@ import java.util.UUID
 import org.joda.time.DateTime
 
 trait UserDirectives extends CommonDirectives with BlogFormats with UserFormats {
-  def modelUser: ActorSelection
+  val modelUser: ActorSelection
 
   def handleUsers() = pathEnd {
     headComplete ~

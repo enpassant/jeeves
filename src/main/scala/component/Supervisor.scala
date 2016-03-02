@@ -1,6 +1,6 @@
 package component
 
-import akka.actor.{ActorLogging, Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 
 import core._
 
@@ -24,6 +24,7 @@ class Supervisor(val config: Config) extends Actor with ActorLogging {
 }
 
 object Supervisor {
+  val actorSystem = ActorSystem("james")
   def props(config: Config) = Props(new Supervisor(config))
   def name = "supervisor"
 }

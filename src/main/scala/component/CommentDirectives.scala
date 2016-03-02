@@ -12,7 +12,7 @@ import java.util.UUID
 import org.joda.time.DateTime
 
 trait CommentDirectives extends CommonDirectives with BlogFormats with CommentFormats {
-  def modelComment: ActorSelection
+  val modelComment: ActorSelection
 
   def handleComments(blogId: String) = pathEnd {
     commentLinks(blogId) {
