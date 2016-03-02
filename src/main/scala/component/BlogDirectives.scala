@@ -40,8 +40,9 @@ trait BlogDirectives extends CommentDirectives
     get {
       Right.checkRight(optUser, RoleAddNew) {
         val uuid = UUID.randomUUID.toString
+        val accountId = optUser.flatMap(_.login).getOrElse("")
         respondWithLinks(blogItemLink("self", uuid, methods = List(PUT))) {
-          complete(Blog(uuid, "john", DateTime.now, "", ""))
+          complete(Blog(uuid, accountId, DateTime.now, "", ""))
         }
       }
     }
