@@ -46,16 +46,16 @@ class Service(val config: Config, val routerDefined: Boolean)
           getFromResource(s"public/html/$path")
         } ~
         pathPrefix("api") {
-          optionalToken { token =>
-            optionalUser(token) { user =>
-              (blogLinks & tokenLinks & userMenuLinks & userItemLinks) {
+          optionalToken { optToken =>
+            optionalUser(optToken) { optUser =>
+              (blogLinks(optUser) & tokenLinks & userMenuLinks & userItemLinks) {
                 headComplete
               } ~
               (tokenLinks & userItemLinks) {
                 pathPrefix("blogs") {
-                  handleBlogs ~
-                  handleNewBlogs ~
-                  pathPrefix(Segment)(handleBlog)
+                  handleBlogs(optUser) ~
+                  handleNewBlogs(optUser) ~
+                  pathPrefix(Segment)(handleBlog(optUser))
                 } ~
                 pathPrefix("tokens") {
                   handleTokens

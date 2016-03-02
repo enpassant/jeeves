@@ -12,6 +12,9 @@ import akka.http.scaladsl.unmarshalling._
 case class User(id: String = null, name: Option[String] = None,
   login: Option[String] = None, password: Option[String] = None,
   rolesets: List[Roleset] = List())
+{
+  def hasRole(role: Role) = rolesets.exists(_.roles.contains(role))
+}
 
 case class Login(name: String, password: String)
 

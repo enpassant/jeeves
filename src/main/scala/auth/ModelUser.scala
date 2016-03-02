@@ -1,6 +1,7 @@
 package component
 
 import core._
+import Roles._
 
 import akka.actor.{Actor, Props}
 import java.util.UUID
@@ -9,10 +10,18 @@ import scala.collection.immutable.Map
 
 class ModelUser(val mode: Option[String]) extends Actor {
   // Dummy data for illustration purposes, in ascending order by date
+
+  val RolesetViewer = Roleset("Viewer", List())
+  val RolesetUser = Roleset("User", List(RoleModifyOwn, RoleDeleteOwn, RoleAddNew))
+  val RolesetAdmin = Roleset("Admin", List(RoleViewAll, RoleModifyAll, RoleDeleteAll))
+
   val tableUser = List(
-    User(UUID.randomUUID.toString, Some("Jim"), Some("jim"), Some("jim123"), List()),
-    User(UUID.randomUUID.toString, Some("John"), Some("john"), Some("john123"), List()),
-    User(UUID.randomUUID.toString, Some("Fred"), Some("fred"), Some("fred123"), List())
+    User(UUID.randomUUID.toString, Some("Jim"), Some("jim"), Some("jim123"),
+      List(RolesetViewer)),
+    User(UUID.randomUUID.toString, Some("John"), Some("john"), Some("john123"),
+      List(RolesetUser)),
+    User(UUID.randomUUID.toString, Some("Fred"), Some("fred"), Some("fred123"),
+      List(RolesetUser, RolesetAdmin))
   )
 
   def receive: Receive = process(tableUser)

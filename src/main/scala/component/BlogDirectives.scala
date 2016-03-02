@@ -1,6 +1,7 @@
 package component
 
 import core._
+import Roles._
 
 import akka.actor.ActorSelection
 import akka.http.scaladsl.model._
@@ -20,45 +21,68 @@ trait BlogDirectives extends CommentDirectives
 
   def modelBlog: ActorSelection
 
-  def handleBlogs = pathEnd {
-    respondWithLinks(
-      blogListLink("self"),
-      blogItemLink("item", methods = List(GET, PUT, DELETE)),
-      blogItemLink("new", "new"))
-      {
-        headComplete ~
-        getList[Blog](modelBlog, Blog)()
-      }
+  def handleBlogs(optUser: Option[User]) = pathEnd {
+    val itemMethods = Right.mapActions(optUser, Map(
+      GET -> Authenticated, PUT -> RoleModifyAll, DELETE -> RoleDeleteAll))
+
+    val links = Right.mapActions(optUser, Map(
+      blogListLink("self") -> Everybody,
+      blogItemLink("item", methods = itemMethods) -> Authenticated,
+      blogItemLink("new", "new") -> RoleAddNew))
+
+    respondWithLinks(links:_*) {
+      headComplete ~
+      getList[Blog](modelBlog, Blog)()
+    }
   }
 
-  def handleNewBlogs = path("new") {
+  def handleNewBlogs(optUser: Option[User]) = path("new") {
     get {
-      val uuid = UUID.randomUUID.toString
-      respondWithLinks(blogItemLink("self", uuid, methods = List(PUT))) {
-        complete(Blog(uuid, "john", DateTime.now, "", ""))
+      Right.checkRight(optUser, RoleAddNew) {
+        val uuid = UUID.randomUUID.toString
+        respondWithLinks(blogItemLink("self", uuid, methods = List(PUT))) {
+          complete(Blog(uuid, "john", DateTime.now, "", ""))
+        }
       }
     }
   }
 
-  def handleBlog(blogId: String) = pathEnd {
+  def handleBlog(optUser: Option[User])(blogId: String) = pathEnd {
     getBlogDirective(blogId) {
       case Some(blog: Blog) => {
-        respondBlogLinks(blogId, GET, PUT, DELETE) {
+        val isOwnBlog = CustomRight(
+          () => optUser.flatMap(_.login).getOrElse("") == blog.accountId)
+        val putRight = (RoleModifyAll or (RoleModifyOwn and isOwnBlog))
+        val deleteRight = (RoleDeleteAll or (RoleDeleteOwn and isOwnBlog))
+        val itemMethods = Right.mapActions(optUser, Map(
+          GET -> Authenticated,
+          PUT -> putRight,
+          DELETE -> deleteRight))
+
+        respondBlogLinks(blogId, itemMethods:_*) {
           headComplete ~
-          getEntity[Blog](modelBlog, blogId) ~
-          putEntity[Blog](modelBlog, _.copy(id = blogId), blogId) ~
-          deleteEntity[Blog](modelBlog, blogId)
+          Right.checkRight(optUser, Authenticated) {
+            getEntity[Blog](modelBlog, blogId)
+          } ~
+          Right.checkRight(optUser, putRight) {
+            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
+          } ~
+          Right.checkRight(optUser, deleteRight) {
+            deleteEntity[Blog](modelBlog, blogId)
+          }
         }
       }
       case None =>
-        respondBlogLinks(blogId, PUT) {
-          headComplete ~
-          putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
+        Right.checkRight(optUser, RoleAddNew) {
+          respondBlogLinks(blogId, PUT) {
+            headComplete ~
+            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
+          }
         }
     }
   } ~
   pathPrefix("comments") {
-    blogLinks { handleComments(blogId) } ~
+    blogLinks(optUser) { handleComments(blogId) } ~
     pathPrefix(Segment)(handleComment(blogId) _)
   }
 
@@ -85,10 +109,10 @@ trait BlogDirectives extends CommentDirectives
     mtLink(s"/blogs/$blogId", rel, `application/vnd.enpassant.blog+json`,
       methods:_*)
 
-  def blogLinks = respondWithLinks(
-    collectionLink("/blogs", "blogs", "List Blogs",
-      "accountId date:date title note", GET),
-    mtLink("/blogs/:blogId", "item", `application/vnd.enpassant.blog+json`,
-      GET, PUT, POST, DELETE)
-  )
+  def blogLinks(optUser: Option[User]) = {
+    respondWithLinks(
+      collectionLink("/blogs", "blogs", "List Blogs",
+        "accountId date:date title note", GET)
+    )
+  }
 }
