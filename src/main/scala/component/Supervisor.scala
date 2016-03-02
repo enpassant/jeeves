@@ -27,5 +27,7 @@ object Supervisor {
   val actorSystem = ActorSystem("james")
   def props(config: Config) = Props(new Supervisor(config))
   def name = "supervisor"
+
+  def getChild(childName: String) = actorSystem.actorSelection(s"/user/$name/$childName")
 }
 

@@ -13,12 +13,12 @@ import java.util.UUID
 import org.joda.time.DateTime
 import scala.concurrent.Future
 
-trait TokenDirectives extends CommentDirectives
+object TokenDirectives extends CommentDirectives
   with CommonDirectives with TokenFormats with CommentFormats
 {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def modelToken: ActorSelection
+  val modelToken = Supervisor.getChild(ModelToken.name)
 
   def optionalToken: Directive1[Option[Token]] = optionalCookie("tokenId") flatMap {
     case Some(tokenId) =>

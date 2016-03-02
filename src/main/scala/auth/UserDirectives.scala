@@ -11,13 +11,14 @@ import akka.http.scaladsl.server.Directives._
 import java.util.UUID
 import org.joda.time.DateTime
 
-trait UserDirectives extends CommonDirectives with BlogFormats with UserFormats {
-  val modelUser: ActorSelection
+object UserDirectives extends CommonDirectives with BlogFormats with UserFormats {
+  val modelUser = Supervisor.getChild(ModelUser.name)
 
   def handleUsers() = pathEnd {
     headComplete ~
     getList[User](modelUser, User)()
-  }
+  } ~
+  pathPrefix(Segment)(handleUser)
 
   def handleUser(userId: String) = pathEnd {
     headComplete ~

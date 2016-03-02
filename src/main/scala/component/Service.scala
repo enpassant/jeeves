@@ -20,19 +20,16 @@ import org.joda.time.DateTime
 
 class Service(val config: Config, val routerDefined: Boolean)
   extends Actor
-  with BlogDirectives
-  with TokenDirectives
-  with UserDirectives
+  with CommonDirectives
   with ActorLogging
 {
-  val modelBlog = context.actorSelection("../" + ModelBlog.name)
-  val modelComment = context.actorSelection("../" + ModelComment.name)
-  val modelToken = context.actorSelection("../" + ModelToken.name)
-  val modelUser = context.actorSelection("../" + ModelUser.name)
-
   import context.dispatcher
   implicit val system = context.system
   implicit val materializer = ActorMaterializer()
+
+  import BlogDirectives._
+  import TokenDirectives._
+  import UserDirectives._
 
   val bindingFuture = Http().bindAndHandle(route, config.host, config.port)
 
@@ -59,8 +56,7 @@ class Service(val config: Config, val routerDefined: Boolean)
                   handleTokens
                 } ~
                 pathPrefix("users") {
-                  handleUsers ~
-                  pathPrefix(Segment)(handleUser)
+                  handleUsers()
                 }
               }
             }
@@ -98,10 +94,10 @@ class Service(val config: Config, val routerDefined: Boolean)
     if (config.mode == Some("dev")) {
       requestContext =>
         val start = System.currentTimeMillis
-        println(requestContext)
+        log.debug(requestContext.toString)
         val result = route(requestContext)
         val runningTime = System.currentTimeMillis - start
-        println(s"Running time is ${runningTime} ms")
+        log.debug(s"Running time is ${runningTime} ms")
         result
     } else route
   }

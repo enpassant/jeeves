@@ -14,12 +14,12 @@ import java.util.UUID
 import org.joda.time.DateTime
 import scala.concurrent.Future
 
-trait BlogDirectives extends CommentDirectives
+object BlogDirectives extends CommentDirectives
   with CommonDirectives with BlogFormats with CommentFormats
 {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def modelBlog: ActorSelection
+  val modelBlog = Supervisor.actorSystem.actorSelection("/user/supervisor/" + ModelBlog.name)
 
   def handleBlogs(optUser: Option[User]) = pathEnd {
     val itemMethods = Right.mapActions(optUser, Map(
