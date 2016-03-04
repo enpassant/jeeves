@@ -1,5 +1,5 @@
 define(['./model'], function (model) {
     model.controller = function(args) {
-        return model.vm.init();
+        return new model.vm.init();
     };
 });
