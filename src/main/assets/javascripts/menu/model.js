@@ -70,6 +70,8 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
                 function(user) {
                     model.vm.loggedInUser(user.name);
                     model.vm.loginComponent(model.loggedInComponent);
+                    var route = m.route();
+                    m.route(route, undefined, true);
             }, app.errorHandler(model, "Load logged in user data", model.removeToken));
         }
     };
