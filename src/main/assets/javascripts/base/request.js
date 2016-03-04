@@ -1,4 +1,4 @@
-define(['cookie', 'mithril'], function (Cookies) {
+define(['cookie', 'mithril'], function (Cookies, m) {
     'use strict';
 
     var req = {};

@@ -1,4 +1,4 @@
-define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, req) {
+define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, req, m) {
     var model = {};
 
     model.blog = {};

@@ -1,4 +1,4 @@
-define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, Cookies) {
+define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, Cookies, m) {
     var model = {};
 
     model.vm = {};

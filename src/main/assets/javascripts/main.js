@@ -7,10 +7,10 @@
         keepBuildDir: "true",
         packages: ['app', 'menu', 'collection', 'blog'],
         paths: {
-            'mithril': '../third/mithril/mithril',
-            'mithril-translate': '../third/mithril-translate/mithril-translate.min',
-            'semantic': '../third/semantic/semantic.min',
-            'jquery': '../third/jquery/jquery-1.12.0.min',
+            'mithril': '../lib/mithril/mithril.min',
+            'mithril-translate': '../third/mithril-translate/mithril-translate',
+            'semantic': '../lib/Semantic-UI/semantic.min',
+            'jquery': '../lib/jquery/jquery.min',
             'cookie': '../third/cookie/js.cookie'
         },
         shim: {
@@ -28,7 +28,8 @@
             }
         },
         priority: ["mithril"],
-        baseUrl: '/javascripts'
+        appDir: '../assets',
+        baseUrl: 'javascripts'
     });
 
     requirejs.onError = function(err) {

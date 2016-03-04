@@ -1,5 +1,5 @@
 define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jquery',
-    'semantic', 'mithril'], function (model, app, menu, loc, req, $)
+    'mithril', 'semantic'], function (model, app, menu, loc, req, $, m)
 {
     var deleteItem = function(href) {
         return function(elem) {

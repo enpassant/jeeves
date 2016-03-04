@@ -1,5 +1,5 @@
 define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', 'mithril'],
-     function (model, app, loc, req, Cookies)
+     function (model, app, loc, req, Cookies, m)
 {
     var login = function(name, password) {
         return function(elem) {

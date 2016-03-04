@@ -1,5 +1,5 @@
 define(['./model', './controller', 'base/localization', 'menu', 'mithril'],
-    function (model, controller, loc, menu)
+    function (model, controller, loc, menu, m)
 {
     model.view = function(ctrl) {
         var component = ctrl.component;

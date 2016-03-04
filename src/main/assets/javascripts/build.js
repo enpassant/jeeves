@@ -1,18 +1,17 @@
 requirejs.config({
-  mainConfigFile: 'main.js',
-  optimize: "uglify2",
-//  uglify2: {
-//      mangle: false
-//  },
-  preserveLicenseComments: false,
-  generateSourceMaps: true,
-  packages: ['base'],
-  paths: {
-      'semantic': 'empty:',
-      'cookie': 'empty:',
-      'jquery': 'empty:',
-      'mithril': 'empty:',
-      'mithril-translate': 'empty:',
-      'jsRoutes' : 'empty:'
-  }
+    mainConfigFile: 'main.js',
+    optimize: "uglify2",
+    //  uglify2: {
+    //      mangle: false
+    //  },
+    preserveLicenseComments: false,
+    generateSourceMaps: true,
+    packages: ['base'],
+    paths: {
+        'mithril': '../third/mithril/mithril.min',
+        'mithril-translate': '../third/mithril-translate/mithril-translate.min',
+        'semantic': '../third/semantic/semantic.min',
+        'jquery': '../third/jquery/jquery-1.12.0.min',
+        'cookie': '../third/cookie/js.cookie'
+    }
 });

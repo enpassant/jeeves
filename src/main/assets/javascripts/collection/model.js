@@ -1,4 +1,4 @@
-define(['menu', 'base/request', 'mithril'], function (menu, req) {
+define(['menu', 'base/request', 'mithril'], function (menu, req, m) {
     var model = {};
 
     model.vm = {};

@@ -1,4 +1,6 @@
-define(['./model', 'menu', 'collection', 'blog'], function (model, menu, collection, blog) {
+define(['./model', 'menu', 'collection', 'blog', 'mithril'],
+    function (model, menu, collection, blog, m)
+{
     model.controller = function(data) {
         var params = m.route.param();
 

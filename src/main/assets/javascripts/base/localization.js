@@ -1,4 +1,4 @@
-define(['cookie', 'mithril-translate'], function (Cookies) {
+define(['cookie', 'mithril-translate'], function (Cookies, mx) {
     'use strict';
 
     var loc = {};

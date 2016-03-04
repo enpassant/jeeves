@@ -1,4 +1,4 @@
-define(['./model', 'menu', 'base/localization', 'mithril'], function (model, menu, loc) {
+define(['./model', 'menu', 'base/localization', 'mithril'], function (model, menu, loc, m) {
     model.view = function(ctrl, args) {
         var date = loc.format(model.vm.blog().date, 'date');
         var editable = ctrl.isEditable() ? "[contenteditable=true]" : "";
