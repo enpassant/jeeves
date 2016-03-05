@@ -22,8 +22,7 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
                 Cookies.remove("tokenId");
                 model.vm.loginComponent(model.loginComponent);
                 model.vm.loggedInUser("");
-                var route = m.route();
-                m.route(route, undefined, true);
+                m.route(m.route(), undefined, true);
             });
     };
 

@@ -17,6 +17,14 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
         });
     };
 
+    model.vm.redirect = function(rel, method) {
+        var page = model.vm.igetPage(rel);
+        if (page && method) {
+            var href = model.vm.getHref(page, method);
+            if (href) return m.route(href);
+        }
+    };
+
     model.vm.getPage = function(rel) {
         return model.vm.pages().find(function(page) {
             return (page.rel === rel);
@@ -70,8 +78,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
                 function(user) {
                     model.vm.loggedInUser(user.name);
                     model.vm.loginComponent(model.loggedInComponent);
-                    var route = m.route();
-                    m.route(route, undefined, true);
+                    m.route(m.route(), undefined, true);
             }, app.errorHandler(model, "Load logged in user data", model.removeToken));
         }
     };

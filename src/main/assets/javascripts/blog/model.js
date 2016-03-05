@@ -20,9 +20,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         blog.note = $('#blog-note').text();
         req.send({method: "PUT", url: url, data: model.vm.blog}, menu.vm.pages).then(
             model.setBlog).then(function() {
-                page = menu.vm.getPage("blogs");
-                var href = menu.vm.getHref(page, "GET");
-                m.route(href);
+                menu.vm.redirect("blogs", "GET");
             });
     };
 
@@ -30,9 +28,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         var page = menu.vm.getPage("self");
         var url = app.fullUri(page.url);
         req.send({method: "DELETE", url: url}, menu.vm.pages).then(function() {
-            page = menu.vm.getPage("blogs");
-            var href = menu.vm.getHref(page, "GET");
-            m.route(href);
+            menu.vm.redirect("blogs", "GET");
         });
     };
 
