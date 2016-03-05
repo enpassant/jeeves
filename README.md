@@ -11,3 +11,30 @@ Simple WEB server based on akka-http
 * Stand-alone executable without any application server
 * Configurable with command line arguments: [scopt](https://github.com/scopt/scopt)
 * Composable with [james](https://github.com/enpassant/james) and another [jeeves](https://github.com/enpassant/jeeves) with the help of [psmith](https://github.com/enpassant/psmith)
+* Build application packages in native formats: [sbt-native-packager](https://github.com/sbt/sbt-native-packager)
+
+# Usage
+## Running in development mode
+> ~reStart
+
+More options: [sbt-revolver](https://github.com/spray/sbt-revolver)
+
+###Command line arguments:
+```
+-h <value> | --host <value>
+    host. Default: localhost
+
+-p <value> | --port <value>
+    port number. Default: 9000
+
+-r <value> | --router <value>
+    router's host and port. e.g.: localhost:9101
+
+-m <value> | --mode <value>
+    running mode. e.g.: dev, test
+```
+
+## Packaging
+> universal:packageBin
+
+More options: [sbt-native-packager](https://github.com/sbt/sbt-native-packager)
