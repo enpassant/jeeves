@@ -8,8 +8,8 @@ case class Config(host: String = "localhost", port: Int = 9000,
     router: Option[String] = None, mode: Option[String] = None)
 
 object Main extends App {
-  val parser = new scopt.OptionParser[Config]("james") {
-    head("james", "1.0")
+  val parser = new scopt.OptionParser[Config]("jeeves") {
+    head("jeeves", "1.0")
     opt[String]('h', "host") action { (x, c) =>
       c.copy(host = x) } text("host. Default: localhost")
     opt[Int]('p', "port") action { (x, c) =>
