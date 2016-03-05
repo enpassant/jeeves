@@ -23,7 +23,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"      %% "akka-actor"              % akkaVersion,
   "com.typesafe.akka"      %% "akka-http-experimental"  % akkaVersion,
   "com.github.nscala-time" %% "nscala-time"             % "1.8.0",
-  "com.github.ancane"      %% "haldr"                   % "0.1",
   "org.json4s"             %% "json4s-jackson"          % "3.2.10",
   "org.json4s"             %% "json4s-ext"              % "3.2.10",
   "org.webjars"             % "requirejs"               % "2.1.22",
