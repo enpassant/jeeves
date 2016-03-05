@@ -2,6 +2,7 @@
 Simple WEB server based on akka-http
 
 # Features
+* RESTful interaction is driven by hypermedia: [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS)
 * Super-fast development turnaround: [sbt-revolver](https://github.com/spray/sbt-revolver)
 * Super-fast UI MVC javascript framework: [mithril](https://lhorie.github.io/mithril/index.html)
 * Fast and simple to use Http stack top on Akka actors: [akka-http](http://doc.akka.io/docs/akka-stream-and-http-experimental/2.0.3/scala/http/introduction.html)
