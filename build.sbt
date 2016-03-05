@@ -14,6 +14,8 @@ ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 Revolver.settings
 
+enablePlugins(JavaAppPackaging)
+
 //resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 
 resolvers += Resolver.sonatypeRepo("public")
