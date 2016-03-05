@@ -35,10 +35,11 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
         return type.match(/application\/([a-z.]+)/)[1];
     };
 
-    model.vm.getHref = function(page, method) {
+    model.vm.getHref = function(page, method, id) {
         if (page && page.method.contains(method)) {
-            return "/" + model.vm.getComponent(page.type) + "?path=" +
-                page.url + "&method=" + method;
+            var url = id ? page.url.replace(/:[a-zA-Z0-9]+/, id) : page.url;
+            return "/" + model.vm.getComponent(page.type) +
+                "?path=" + url + "&method=" + method;
         }
         return undefined;
     };
