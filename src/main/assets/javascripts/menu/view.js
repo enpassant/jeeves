@@ -5,7 +5,7 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
         return function(elem) {
             var link = model.vm.getLink("login", "POST", model.tokenContentType);
             var login = { name: name, password: password };
-            req.send({url: app.fullUri(link.url), method: "POST", data: login}, undefined).then(
+            req.sendLink(link, {data: login}, undefined).then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
                     model.loadUser(token.userId);

@@ -23,6 +23,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
             var methods = arr[i].method.split(" ");
             for (var j = 0, len2 = methods.length; j < len2; j++) {
                 var link = clone(arr[i]);
+                link.fullUrl = app.fullUri(link.url);
                 link.method = methods[j];
                 links.push(link);
             }
@@ -102,8 +103,8 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     model.loadUser = function(userId) {
         var link = model.vm.getLink("user", "GET", model.userContentType);
         if (link) {
-            var url = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, userId));
-            req.send({url: url, method: "GET"}, undefined).then(
+            link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, userId));
+            req.sendLink(link, {}, undefined).then(
                 function(user) {
                     model.vm.loggedInUser(user.name);
                     model.vm.loginComponent(model.loggedInComponent);
@@ -115,8 +116,8 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     model.loadToken = function(tokenId) {
         var link = model.vm.getLink("token", "GET", model.tokenContentType);
         if (link) {
-            var url = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, tokenId));
-            return req.send({url: url, method: "GET"}, undefined).then(
+            link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, tokenId));
+            return req.sendLink(link,{}, undefined).then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
                     model.loadUser(token.userId);
