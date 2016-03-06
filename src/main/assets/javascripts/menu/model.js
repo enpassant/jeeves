@@ -18,14 +18,14 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.vm.redirect = function(rel, method) {
-        var page = model.vm.igetPage(rel);
+        var page = model.vm.getLink(rel);
         if (page && method) {
             var href = model.vm.getHref(page, method);
             if (href) return m.route(href);
         }
     };
 
-    model.vm.getPage = function(rel) {
+    model.vm.getLink = function(rel) {
         return model.vm.pages().find(function(page) {
             return (page.rel === rel);
         });
@@ -72,7 +72,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.loadUser = function(userId) {
-        var page = model.vm.getPage("user");
+        var page = model.vm.getLink("user");
         if (page) {
             var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, userId));
             req.send({url: url, method: "GET"}, undefined).then(
@@ -85,7 +85,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.loadToken = function(tokenId) {
-        var page = model.vm.getPage("token");
+        var page = model.vm.getLink("token");
         if (page) {
             var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, tokenId));
             return req.send({url: url, method: "GET"}, undefined).then(

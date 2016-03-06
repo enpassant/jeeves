@@ -18,19 +18,19 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
     };
 
     model.view = function() {
-        var page = menu.vm.getPage("self");
+        var page = menu.vm.getLink("self");
         var columns = menu.vm.getColumns(page);
         var columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(column.name));
         });
         var operations = [ m("i.configure.icon") ];
-        page = menu.vm.getPage("new");
+        page = menu.vm.getLink("new");
         var href = menu.vm.getHref(page, "GET");
         if (href) {
             operations.push(m("a", {href: href, config: m.route}, m("i.add.circle.icon")));
         }
         columnsUI.push(m("th", operations));
-        page = menu.vm.getPage("item");
+        page = menu.vm.getLink("item");
         return m("div", [
             m("table.ui.compact.striped.table", [
                 m("thead", [

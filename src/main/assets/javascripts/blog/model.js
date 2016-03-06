@@ -13,7 +13,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     model.vm.blog = m.prop({});
 
     model.vm.send = function() {
-        var page = menu.vm.getPage("self");
+        var page = menu.vm.getLink("self");
         var url = app.fullUri(page.url);
         var blog = model.vm.blog();
         blog.title = $('#blog-title').text();
@@ -25,7 +25,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     };
 
     model.vm.delete = function() {
-        var page = menu.vm.getPage("self");
+        var page = menu.vm.getLink("self");
         var url = app.fullUri(page.url);
         req.send({method: "DELETE", url: url}, menu.vm.pages).then(function() {
             menu.vm.redirect("blogs", "GET");
@@ -33,7 +33,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     };
 
     model.vm.init = function() {
-        this.page = menu.vm.getPage("self");
+        this.page = menu.vm.getLink("self");
         this.putHref = menu.vm.getHref(this.page, "PUT");
         this.deleteHref = menu.vm.getHref(this.page, "DELETE");
         this.params = m.route.param();
