@@ -35,10 +35,8 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     };
 
     model.vm.init = function() {
-        var page = menu.vm.getLink("self", "PUT", model.contentType);
-        this.putHref = menu.vm.getHref(page, "PUT");
-        page = menu.vm.getLink("self", "DELETE", model.contentType);
-        this.deleteHref = menu.vm.getHref(page, "DELETE");
+        this.putHref = menu.vm.getHref("self", "PUT", model.contentType);
+        this.deleteHref = menu.vm.getHref("self", "DELETE", model.contentType);
         this.params = m.route.param();
         this.isEditable = m.prop(this.params.method == "PUT" && this.putHref);
         return this;

@@ -49,25 +49,27 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
         });
     };
 
-    model.vm.redirect = function(rel, method, contentType) {
-        var page = model.vm.getLink(rel, method, contentType);
-        if (page && method) {
-            var href = model.vm.getHref(page, method);
-            if (href) return m.route(href);
-        }
+    model.vm.redirect = function(rel, method) {
+        var href = model.vm.getHref(rel, method);
+        if (href) return m.route(href);
     };
 
     model.vm.getComponent = function(type) {
         return type.match(/application\/([a-z.]+)/)[1];
     };
 
-    model.vm.getHref = function(page, method, id) {
-        if (page && page.method.contains(method)) {
-            var url = id ? page.url.replace(/:[a-zA-Z0-9]+/, id) : page.url;
-            return "/" + model.vm.getComponent(page.type) +
-                "?path=" + url + "&method=" + method;
+    model.vm.getLinkHref = function(link, id) {
+        if (link) {
+            var url = id ? link.url.replace(/:[a-zA-Z0-9]+/, id) : link.url;
+            return "/" + model.vm.getComponent(link.type) +
+                "?path=" + url + "&method=" + link.method;
         }
         return undefined;
+    };
+
+    model.vm.getHref = function(rel, method, contentType, id) {
+        var link = model.vm.getLink(rel, method, contentType);
+        return model.vm.getLinkHref(link, id);
     };
 
     model.vm.init = function() {

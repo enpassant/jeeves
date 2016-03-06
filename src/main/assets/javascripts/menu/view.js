@@ -49,10 +49,10 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
 
     model.view = function() {
         var menuItems = model.vm.links().filter(function(page) {
-            return page.title;
+            return page.title && page.method === 'GET';
         }).map(function(page) {
             return m("a.item", {
-                href: model.vm.getHref(page, "GET"),
+                href: model.vm.getLinkHref(page),
                 config: m.route},
                 loc.tr(page.title || ("get " + page.rel)));
         });

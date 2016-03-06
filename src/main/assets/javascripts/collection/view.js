@@ -24,8 +24,7 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
             return m("th", loc.tr(column.name));
         });
         var operations = [ m("i.configure.icon") ];
-        page = menu.vm.getLink("new", "GET");
-        var href = menu.vm.getHref(page, "GET");
+        var href = menu.vm.getHref("new", "GET");
         if (href) {
             operations.push(m("a", {href: href, config: m.route}, m("i.add.circle.icon")));
         }
@@ -43,21 +42,18 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
                                    loc.format(row[column.name], column.type) : "");
                         });
                         var operations = [];
-                        page = menu.vm.getLink("item", "GET");
-                        href = menu.vm.getHref(page, "GET", id);
+                        href = menu.vm.getHref("item", "GET", undefined, id);
                         if (href) {
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.unhide.icon")));
                         }
-                        page = menu.vm.getLink("item", "PUT");
-                        href = menu.vm.getHref(page, "PUT", id);
+                        href = menu.vm.getHref("item", "PUT", undefined, id);
                         if (href) {
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.write.icon")));
                         }
                         page = menu.vm.getLink("item", "DELETE");
-                        href = menu.vm.getHref(page, "DELETE");
-                        if (href) {
+                        if (page) {
                             href = (app.fullUri(page.url)).replace(/:[a-zA-Z0-9]+/, id);
                             operations.push(m("a.clickable", {onclick: deleteItem(href)},
                                 m("i.trash.outline.icon")));
