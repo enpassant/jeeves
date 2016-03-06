@@ -15,21 +15,21 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     model.vm.blog = m.prop({});
 
     model.vm.send = function() {
-        var page = menu.vm.getLink("self", "PUT", model.contentType);
-        var url = app.fullUri(page.url);
+        var link = menu.vm.getLink("self", "PUT", model.contentType);
+        var url = app.fullUri(link.url);
         var blog = model.vm.blog();
         blog.title = $('#blog-title').text();
         blog.note = $('#blog-note').text();
-        req.send({method: "PUT", url: url, data: model.vm.blog}, menu.vm.pages).then(
+        req.send({method: "PUT", url: url, data: model.vm.blog}, menu.vm.setLinks).then(
             model.setBlog).then(function() {
                 menu.vm.redirect("blogs", "GET");
             });
     };
 
     model.vm.delete = function() {
-        var page = menu.vm.getLink("self", "DELETE", model.contentType);
-        var url = app.fullUri(page.url);
-        req.send({method: "DELETE", url: url}, menu.vm.pages).then(function() {
+        var link = menu.vm.getLink("self", "DELETE", model.contentType);
+        var url = app.fullUri(link.url);
+        req.send({method: "DELETE", url: url}, menu.vm.setLinks).then(function() {
             menu.vm.redirect("blogs", "GET");
         });
     };
@@ -46,9 +46,9 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         model.vm.blog = m.prop({});
 
         if (url.contains(':')) {
-            return req.head({url: url}, menu.vm.pages);
+            return req.head({url: url}, menu.vm.setLinks);
         } else {
-            return req.send({method: "GET", url: url}, menu.vm.pages).then(model.setBlog);
+            return req.send({method: "GET", url: url}, menu.vm.setLinks).then(model.setBlog);
         }
     };
 

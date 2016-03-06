@@ -11,7 +11,7 @@ define(['menu', 'base/request', 'mithril'], function (menu, req, m) {
     };
 
     model.load = function(url) {
-        return req.send({method: "GET", url: url}, menu.vm.pages).then(model.vm.rows);
+        return req.send({method: "GET", url: url}, menu.vm.setLinks).then(model.vm.rows);
     };
 
     return model;

@@ -8,7 +8,7 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
                 onApprove : function() {
                     m.startComputation();
                     var params = m.route.param();
-                    req.send({url: href, method: "DELETE"}, menu.vm.pages).then(function() {
+                    req.send({url: href, method: "DELETE"}, menu.vm.setLinks).then(function() {
                         model.load(app.fullUri(params.path));
                     });
                     m.endComputation();
@@ -18,8 +18,8 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
     };
 
     model.view = function() {
-        var page = menu.vm.getLink("self", "GET", model.contentType);
-        var columns = menu.vm.getColumns(page);
+        var link = menu.vm.getLink("self", "GET", model.contentType);
+        var columns = menu.vm.getColumns(link);
         var columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(column.name));
         });
@@ -52,9 +52,9 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.write.icon")));
                         }
-                        page = menu.vm.getLink("item", "DELETE");
-                        if (page) {
-                            href = (app.fullUri(page.url)).replace(/:[a-zA-Z0-9]+/, id);
+                        link = menu.vm.getLink("item", "DELETE");
+                        if (link) {
+                            href = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
                             operations.push(m("a.clickable", {onclick: deleteItem(href)},
                                 m("i.trash.outline.icon")));
                         }

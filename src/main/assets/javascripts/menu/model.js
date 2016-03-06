@@ -17,7 +17,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
         return copy;
     }
 
-    model.vm.pages = function(arr) {
+    model.vm.setLinks = function(arr) {
         var links = [];
         for (var i = 0, len = arr.length; i < len; i++) {
             var methods = arr[i].method.split(" ");
@@ -30,8 +30,8 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
         model.vm.links(links);
     };
 
-    model.vm.getColumns = function(page) {
-        var columns = page ? page.columns.split(" ") : [];
+    model.vm.getColumns = function(link) {
+        var columns = link ? link.columns.split(" ") : [];
         return columns.map(function(column) {
             var arr = column.split(":");
             if (arr.length >= 2) {
@@ -43,9 +43,9 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.vm.getLink = function(rel, method, contentType) {
-        return model.vm.links().find(function(page) {
-            return (page.rel === rel && page.method === method &&
-                (typeof contentType === 'undefined' || page.type === contentType));
+        return model.vm.links().find(function(link) {
+            return (link.rel === rel && link.method === method &&
+                (typeof contentType === 'undefined' || link.type === contentType));
         });
     };
 
@@ -83,7 +83,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.load = function(url) {
-        return req.head({url: url}, model.vm.pages);
+        return req.head({url: url}, model.vm.setLinks);
     };
 
     model.loginComponent = {};
@@ -100,9 +100,9 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.loadUser = function(userId) {
-        var page = model.vm.getLink("user", "GET", model.userContentType);
-        if (page) {
-            var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, userId));
+        var link = model.vm.getLink("user", "GET", model.userContentType);
+        if (link) {
+            var url = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, userId));
             req.send({url: url, method: "GET"}, undefined).then(
                 function(user) {
                     model.vm.loggedInUser(user.name);
@@ -113,9 +113,9 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.loadToken = function(tokenId) {
-        var page = model.vm.getLink("token", "GET", model.tokenContentType);
-        if (page) {
-            var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, tokenId));
+        var link = model.vm.getLink("token", "GET", model.tokenContentType);
+        if (link) {
+            var url = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, tokenId));
             return req.send({url: url, method: "GET"}, undefined).then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
