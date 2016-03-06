@@ -3,7 +3,29 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
 
     model.vm = {};
 
-    model.vm.pages = m.prop([]);
+    model.vm.links = m.prop([]);
+
+    function clone(obj) {
+        if (null === obj || "object" != typeof obj) return obj;
+        var copy = obj.constructor();
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+        }
+        return copy;
+    }
+
+    model.vm.pages = function(arr) {
+        var links = [];
+        for (var i = 0, len = arr.length; i < len; i++) {
+            var methods = arr[i].method.split(" ");
+            for (var j = 0, len2 = methods.length; j < len2; j++) {
+                var link = clone(arr[i]);
+                link.method = methods[j];
+                links.push(link);
+            }
+        }
+        model.vm.links(links);
+    };
 
     model.vm.getColumns = function(page) {
         var columns = page ? page.columns.split(" ") : [];
@@ -26,7 +48,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.vm.getLink = function(rel) {
-        return model.vm.pages().find(function(page) {
+        return model.vm.links().find(function(page) {
             return (page.rel === rel);
         });
     };

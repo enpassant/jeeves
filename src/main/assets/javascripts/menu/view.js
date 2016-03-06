@@ -48,7 +48,7 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
     };
 
     model.view = function() {
-        var menuItems = model.vm.pages().filter(function(page) {
+        var menuItems = model.vm.links().filter(function(page) {
             return page.title;
         }).map(function(page) {
             return m("a.item", {
