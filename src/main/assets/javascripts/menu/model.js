@@ -1,6 +1,9 @@
 define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, Cookies, m) {
     var model = {};
 
+    model.userContentType = 'application/vnd.enpassant.user+json';
+    model.tokenContentType = 'application/vnd.enpassant.token+json';
+
     model.vm = {};
 
     model.vm.links = m.prop([]);
@@ -39,18 +42,19 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
         });
     };
 
-    model.vm.redirect = function(rel, method) {
-        var page = model.vm.getLink(rel);
+    model.vm.getLink = function(rel, method, contentType) {
+        return model.vm.links().find(function(page) {
+            return (page.rel === rel && page.method === method &&
+                (typeof contentType === 'undefined' || page.type === contentType));
+        });
+    };
+
+    model.vm.redirect = function(rel, method, contentType) {
+        var page = model.vm.getLink(rel, method, contentType);
         if (page && method) {
             var href = model.vm.getHref(page, method);
             if (href) return m.route(href);
         }
-    };
-
-    model.vm.getLink = function(rel) {
-        return model.vm.links().find(function(page) {
-            return (page.rel === rel);
-        });
     };
 
     model.vm.getComponent = function(type) {
@@ -94,7 +98,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.loadUser = function(userId) {
-        var page = model.vm.getLink("user");
+        var page = model.vm.getLink("user", "GET", model.userContentType);
         if (page) {
             var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, userId));
             req.send({url: url, method: "GET"}, undefined).then(
@@ -107,7 +111,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.loadToken = function(tokenId) {
-        var page = model.vm.getLink("token");
+        var page = model.vm.getLink("token", "GET", model.tokenContentType);
         if (page) {
             var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, tokenId));
             return req.send({url: url, method: "GET"}, undefined).then(

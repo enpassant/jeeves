@@ -3,7 +3,7 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
 {
     var login = function(name, password) {
         return function(elem) {
-            var page = model.vm.getLink("login");
+            var page = model.vm.getLink("login", "POST", model.tokenContentType);
             var login = { name: name, password: password };
             req.send({url: app.fullUri(page.url), method: "POST", data: login}, undefined).then(
                 function(token) {
@@ -15,7 +15,7 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
     };
 
     var logout = function() {
-        var page = model.vm.getLink("token");
+        var page = model.vm.getLink("token", "DELETE", model.tokenContentType);
         var url = app.fullUri(page.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId")));
         req.send({url: url, method: "DELETE"}, undefined).then(
             function(token) {

@@ -1,6 +1,8 @@
 define(['menu', 'base/request', 'mithril'], function (menu, req, m) {
     var model = {};
 
+    model.contentType = 'application/collection+json';
+
     model.vm = {};
 
     model.vm.rows = m.prop([]);

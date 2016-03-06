@@ -18,19 +18,18 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
     };
 
     model.view = function() {
-        var page = menu.vm.getLink("self");
+        var page = menu.vm.getLink("self", "GET", model.contentType);
         var columns = menu.vm.getColumns(page);
         var columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(column.name));
         });
         var operations = [ m("i.configure.icon") ];
-        page = menu.vm.getLink("new");
+        page = menu.vm.getLink("new", "GET");
         var href = menu.vm.getHref(page, "GET");
         if (href) {
             operations.push(m("a", {href: href, config: m.route}, m("i.add.circle.icon")));
         }
         columnsUI.push(m("th", operations));
-        page = menu.vm.getLink("item");
         return m("div", [
             m("table.ui.compact.striped.table", [
                 m("thead", [
@@ -44,16 +43,19 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
                                    loc.format(row[column.name], column.type) : "");
                         });
                         var operations = [];
+                        page = menu.vm.getLink("item", "GET");
                         href = menu.vm.getHref(page, "GET", id);
                         if (href) {
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.unhide.icon")));
                         }
+                        page = menu.vm.getLink("item", "PUT");
                         href = menu.vm.getHref(page, "PUT", id);
                         if (href) {
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.write.icon")));
                         }
+                        page = menu.vm.getLink("item", "DELETE");
                         href = menu.vm.getHref(page, "DELETE");
                         if (href) {
                             href = (app.fullUri(page.url)).replace(/:[a-zA-Z0-9]+/, id);
