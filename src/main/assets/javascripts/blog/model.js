@@ -16,11 +16,10 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
 
     model.vm.send = function() {
         var link = menu.vm.getLink("self", "PUT", model.contentType);
-        var url = app.fullUri(link.url);
         var blog = model.vm.blog();
         blog.title = $('#blog-title').text();
         blog.note = $('#blog-note').text();
-        req.send({method: "PUT", url: url, data: model.vm.blog}, menu.vm.setLinks).then(
+        req.sendData(link, model.vm.blog, model.contentType, menu.vm.setLinks).then(
             model.setBlog).then(function() {
                 menu.vm.redirect("blogs", "GET");
             });

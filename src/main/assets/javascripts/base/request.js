@@ -56,11 +56,21 @@ define(['cookie', 'mithril'], function (Cookies, m) {
         return m.request(params);
     };
 
-    req.sendLink = function(link, params, linkVar) {
+    req.sendData = function(link, data, contentType, linkVar) {
+        return req.sendLink(link, {data: data}, linkVar, contentType);
+    };
+
+    req.sendLink = function(link, params, linkVar, contentType) {
+        params.deserialize = function(data) {
+            return JSON.parse(data);
+        };
         params.method = link.method;
         params.url = link.fullUrl;
         params.config = function(xhr, xhrOptions) {
             xhr.setRequestHeader("Accept", link.type);
+            if (contentType) {
+                xhr.setRequestHeader("Content-Type", contentType + "; charset=utf-8");
+            }
             return xhr;
         };
         params.extract = linkVar ? extract(linkVar) : baseExtract;
