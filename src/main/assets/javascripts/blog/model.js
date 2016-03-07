@@ -47,7 +47,8 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         if (url.contains(':')) {
             return req.head({url: url}, menu.vm.setLinks);
         } else {
-            return req.send({method: "GET", url: url}, menu.vm.setLinks).then(model.setBlog);
+            var link = {method: "GET", fullUrl: url, type: model.contentType};
+            return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog);
         }
     };
 

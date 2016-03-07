@@ -29,5 +29,5 @@ trait BlogFormats extends BaseFormats {
     marshaller[Blog](MediaTypes.`application/json`))
 
   implicit val SeqBlogMarshaller = marshaller[Seq[Blog]](
-    MediaTypes.`application/json`)
+    `application/collection+json`)
 }
