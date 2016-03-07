@@ -9,17 +9,25 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
 
-case class Token(id: String = null, userId: String, date: DateTime = DateTime.now)
+case class Blog(id: String = null, accountId: String,
+  date: DateTime = DateTime.now, title: String, note: String)
 
-trait TokenFormats extends BaseFormats {
-  lazy val `application/vnd.enpassant.token+json` =
-    customMediaTypeUTF8("vnd.enpassant.token+json")
+trait BlogFormats extends BaseFormats {
+  lazy val `application/vnd.enpassant.blog+json` =
+    customMediaTypeUTF8("vnd.enpassant.blog+json")
+  lazy val `application/vnd.enpassant.blog-v2+json` =
+    customMediaTypeUTF8("vnd.enpassant.blog-v2+json")
 
-  implicit val TokenUnmarshaller = Unmarshaller.firstOf(
-    unmarshaller[Token](`application/vnd.enpassant.token+json`),
-    unmarshaller[Token](MediaTypes.`application/json`))
+  implicit val BlogUnmarshaller = Unmarshaller.firstOf(
+    unmarshaller[Blog](`application/vnd.enpassant.blog-v2+json`),
+    unmarshaller[Blog](`application/vnd.enpassant.blog+json`),
+    unmarshaller[Blog](MediaTypes.`application/json`))
 
-  implicit val TokenMarshaller = Marshaller.oneOf(
-    marshaller[Token](`application/vnd.enpassant.token+json`),
-    marshaller[Token](MediaTypes.`application/json`))
+  implicit val BlogMarshaller = Marshaller.oneOf(
+    marshaller[Blog](`application/vnd.enpassant.blog-v2+json`),
+    marshaller[Blog](`application/vnd.enpassant.blog+json`),
+    marshaller[Blog](MediaTypes.`application/json`))
+
+  implicit val SeqBlogMarshaller = marshaller[Seq[Blog]](
+    `application/collection+json`)
 }
