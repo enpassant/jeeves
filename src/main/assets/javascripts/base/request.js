@@ -51,11 +51,6 @@ define(['cookie', 'mithril'], function (Cookies, m) {
         return m.request(params);
     };
 
-    req.send = function(params, linkVar) {
-        params.extract = linkVar ? extract(linkVar) : baseExtract;
-        return m.request(params);
-    };
-
     req.sendData = function(link, data, contentType, linkVar) {
         return req.sendLink(link, {data: data}, linkVar, contentType);
     };

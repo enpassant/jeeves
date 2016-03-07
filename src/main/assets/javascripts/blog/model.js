@@ -14,7 +14,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
 
     model.vm.blog = m.prop({});
 
-    model.vm.send = function() {
+    model.vm.save = function() {
         var link = menu.vm.getLink("self", "PUT", model.contentType);
         var blog = model.vm.blog();
         blog.title = $('#blog-title').text();
@@ -28,7 +28,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     model.vm.delete = function() {
         var link = menu.vm.getLink("self", "DELETE", model.contentType);
         var url = app.fullUri(link.url);
-        req.send({method: "DELETE", url: url}, menu.vm.setLinks).then(function() {
+        req.sendLink(link, {}, menu.vm.setLinks).then(function() {
             menu.vm.redirect("blogs", "GET");
         });
     };

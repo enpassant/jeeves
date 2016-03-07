@@ -24,7 +24,7 @@ define(['./model', 'menu', 'base/localization', 'mithril'], function (model, men
                 m("i.comment.icon"), "1 comment"
             ]),
             m("div.extra.content", [
-                m("button.ui.button.right.floated", {onclick: model.vm.send}, "OK"),
+                m("button.ui.button.right.floated", {onclick: model.vm.save}, "OK"),
                 editIcon,
                 deleteButton
             ])

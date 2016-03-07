@@ -1,14 +1,15 @@
 define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jquery',
     'mithril', 'semantic'], function (model, app, menu, loc, req, $, m)
 {
-    var deleteItem = function(href) {
+    var deleteItem = function(link, id) {
         return function(elem) {
             var $dialog = $('.ui.modal.delete');
             $dialog.modal({
                 onApprove : function() {
                     m.startComputation();
                     var params = m.route.param();
-                    req.send({url: href, method: "DELETE"}, menu.vm.setLinks).then(function() {
+                    link.fullUrl = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
+                    req.sendLink(link, {}, menu.vm.setLinks).then(function() {
                         model.load(app.fullUri(params.path));
                     });
                     m.endComputation();
@@ -54,8 +55,7 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
                         }
                         link = menu.vm.getLink("item", "DELETE");
                         if (link) {
-                            href = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
-                            operations.push(m("a.clickable", {onclick: deleteItem(href)},
+                            operations.push(m("a.clickable", {onclick: deleteItem(link, id)},
                                 m("i.trash.outline.icon")));
                         }
                         columnValueUI.push(m("td", operations));

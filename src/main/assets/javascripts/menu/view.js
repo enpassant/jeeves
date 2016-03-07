@@ -16,8 +16,8 @@ define(['./model', 'app/model', 'base/localization', 'base/request', 'cookie', '
 
     var logout = function() {
         var link = model.vm.getLink("token", "DELETE", model.tokenContentType);
-        var url = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId")));
-        req.send({url: url, method: "DELETE"}, undefined).then(
+        link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId")));
+        req.sendLink(link, {}, undefined).then(
             function(token) {
                 Cookies.remove("tokenId");
                 model.vm.loginComponent(model.loginComponent);
