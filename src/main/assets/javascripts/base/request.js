@@ -45,10 +45,9 @@ define(['cookie', 'mithril'], function (Cookies, m) {
         };
     };
 
-    req.head = function(params, linkVar) {
-        params.method = 'HEAD';
-        params.extract = linkVar ? extract(linkVar) : baseExtract;
-        return m.request(params);
+    req.head = function(url, linkVar) {
+        var link = { method: 'HEAD', fullUrl: url };
+        return req.sendLink(link, {}, linkVar);
     };
 
     req.sendData = function(link, data, contentType, linkVar) {
@@ -62,7 +61,9 @@ define(['cookie', 'mithril'], function (Cookies, m) {
         params.method = link.method;
         params.url = link.fullUrl;
         params.config = function(xhr, xhrOptions) {
-            xhr.setRequestHeader("Accept", link.type);
+            if (link.type) {
+                xhr.setRequestHeader("Accept", link.type);
+            }
             if (contentType) {
                 xhr.setRequestHeader("Content-Type", contentType + "; charset=utf-8");
             }

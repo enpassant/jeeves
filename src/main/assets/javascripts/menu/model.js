@@ -84,7 +84,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.load = function(url) {
-        return req.head({url: url}, model.vm.setLinks);
+        return req.head(url, model.vm.setLinks);
     };
 
     model.loginComponent = {};

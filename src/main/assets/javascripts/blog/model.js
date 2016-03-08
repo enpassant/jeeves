@@ -45,7 +45,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         model.vm.blog = m.prop({});
 
         if (url.contains(':')) {
-            return req.head({url: url}, menu.vm.setLinks);
+            return req.head(url, menu.vm.setLinks);
         } else {
             var link = {method: "GET", fullUrl: url, type: model.contentType};
             return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog);
