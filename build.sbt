@@ -1,4 +1,4 @@
-name := """james"""
+name := """jeeves"""
 
 version := "1.0"
 
@@ -15,8 +15,6 @@ ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 Revolver.settings
 
 enablePlugins(JavaAppPackaging)
-
-//resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 
 resolvers += Resolver.sonatypeRepo("public")
 
@@ -44,24 +42,22 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
 
-//parallelExecution in Test := false
-
-//fork in run := true
-
-//connectInput in run := true
-
-//outputStrategy in run := Some(StdoutOutput)
-
 lazy val dev = config("dev") describedAs("dev environment settings")
 lazy val prod = config("prod") describedAs("prod environment settings")
 
+import com.typesafe.sbt.web.pipeline.Pipeline
+
 lazy val prodSettings = Seq(
-    RjsKeys.mainModule := "build",
     RjsKeys.optimize := "ugilfy2"
 )
 
-lazy val root = (project.in(file("."))).enablePlugins(SbtWeb).configs(dev, prod).settings(
-    inConfig(prod)(prodSettings): _*)
+lazy val devSettings = Seq(
+    RjsKeys.optimize := "none"
+)
+
+lazy val root = (project.in(file("."))).enablePlugins(SbtWeb).configs(dev, prod).
+  settings(inConfig(prod)(prodSettings): _*).
+  settings(inConfig(dev)(devSettings): _*)
 
 (managedClasspath in Runtime) += (packageBin in Assets).value
 
@@ -71,7 +67,5 @@ WebKeys.packagePrefix in Assets := "public/"
 
 //RjsKeys.mainModule := "build"
 
-//RjsKeys.optimize := "none"
-
-pipelineStages := Seq(rjs)
+pipelineStages := Seq(rjs, digest, gzip)
 
