@@ -1,5 +1,5 @@
-define(['./model', './controller', 'base/localization', 'menu', 'mithril'],
-    function (model, controller, loc, menu, m)
+define(['./model', './controller', 'menu', 'mithril'],
+    function (model, controller, menu, m)
 {
     model.view = function(ctrl) {
         var component = ctrl.component;

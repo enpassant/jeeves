@@ -1,22 +1,22 @@
 (function(requirejs) {
     "use strict";
 
-    require.config({
+    function gC(k){return(document.cookie.match('(^|; )'+k+'=([^;]*)')||0)[2];}
+
+    var lang = gC("lang");
+
+    requirejs.config({
         optimize: "none",
         skipDirOptimize: "true",
         keepBuildDir: "true",
         packages: ['app', 'menu', 'collection', 'blog'],
         paths: {
             'mithril': '../lib/mithril/mithril.min',
-            'mithril-translate': '../third/mithril-translate/mithril-translate',
             'semantic': '../lib/Semantic-UI/semantic.min',
             'jquery': '../lib/jquery/jquery.min',
             'cookie': '../third/cookie/js.cookie'
         },
         shim: {
-            'mithril-translate': {
-                deps: [ 'mithril' ]
-            },
             'semantic': {
                 deps: ['jquery']
             },
@@ -24,12 +24,20 @@
                 exports : '$'
             },
             'app': {
-                deps: ['mithril-translate', 'semantic']
+                deps: ['semantic']
             }
         },
         priority: ["mithril"],
         appDir: '../assets',
         baseUrl: 'javascripts'
+    });
+
+    requirejs.config({
+        config: {
+            i18n: {
+                locale: lang
+            }
+        }
     });
 
     requirejs.onError = function(err) {
