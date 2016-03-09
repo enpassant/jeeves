@@ -6,7 +6,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
         return function(elem) {
             var link = model.vm.getLink("login", "POST", model.tokenContentType);
             var login = { name: name, password: password };
-            req.sendLink(link, {data: login}, undefined).then(
+            req.sendData(link, login, 'application/json').then(
                 function(token) {
                     Cookies.set("tokenId", token.id);
                     model.loadUser(token.userId);

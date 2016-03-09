@@ -44,7 +44,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     model.load = function(url) {
         model.vm.blog = m.prop({});
 
-        if (url.contains(':')) {
+        if (url.indexOf(':') >= 0) {
             return req.head(url, menu.vm.setLinks);
         } else {
             var link = {method: "GET", fullUrl: url, type: model.contentType};

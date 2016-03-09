@@ -55,6 +55,9 @@ define(['cookie', 'mithril'], function (Cookies, m) {
     };
 
     req.sendLink = function(link, params, linkVar, contentType) {
+        params.serialize = function(data) {
+            return JSON.stringify(data);
+        };
         params.deserialize = function(data) {
             return JSON.parse(data);
         };
