@@ -1,4 +1,4 @@
-define(['cookie'], function (Cookies) {
+define([], function () {
     'use strict';
 
     var loc = {};
@@ -7,7 +7,7 @@ define(['cookie'], function (Cookies) {
         return msg[value] || value;
     };
 
-    var language = Cookies.get("lang") || navigator.userLanguage || navigator.language;
+    var language = localStorage.lang || navigator.userLanguage || navigator.language;
 
     loc.format = function(value, type) {
         if (type === 'date') return new Date(value).toLocaleDateString(language);

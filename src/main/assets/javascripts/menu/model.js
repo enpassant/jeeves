@@ -1,4 +1,4 @@
-define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, Cookies, m) {
+define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
     var model = {};
 
     model.userContentType = 'application/vnd.enpassant.user+json';
@@ -77,7 +77,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     };
 
     model.initToken = function() {
-        var tokenId = Cookies.get('tokenId');
+        var tokenId = sessionStorage.tokenId;
         if (tokenId && !model.vm.loggedInUser()) {
             var tokenPromise = model.loadToken(tokenId);
         }
@@ -95,7 +95,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
     model.vm.loggedInUser = m.prop("");
 
     model.removeToken = function(tokenId) {
-        Cookies.remove("tokenId");
+        sessionStorage.removeItem("tokenId");
         model.vm.loginComponent(model.loginComponent);
         model.vm.loggedInUser("");
     };
@@ -119,7 +119,7 @@ define(['base/request', 'app/model', 'cookie', 'mithril'], function (req, app, C
             link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, tokenId));
             return req.sendLink(link,{}, undefined).then(
                 function(token) {
-                    Cookies.set("tokenId", token.id);
+                    sessionStorage.tokenId = token.id;
                     model.loadUser(token.userId);
                 }, app.errorHandler(model, "Load logged in user data", model.removeToken)
             );

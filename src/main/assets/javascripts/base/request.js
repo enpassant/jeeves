@@ -1,4 +1,4 @@
-define(['cookie', 'mithril'], function (Cookies, m) {
+define(['mithril'], function (m) {
     'use strict';
 
     var req = {};
@@ -64,6 +64,9 @@ define(['cookie', 'mithril'], function (Cookies, m) {
         params.method = link.method;
         params.url = link.fullUrl;
         params.config = function(xhr, xhrOptions) {
+            if (sessionStorage.tokenId) {
+                xhr.setRequestHeader("X-Auth-Token", sessionStorage.tokenId);
+            }
             if (link.type) {
                 xhr.setRequestHeader("Accept", link.type);
             }

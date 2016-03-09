@@ -1,6 +1,6 @@
 define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
-     'base/request', 'cookie', 'mithril'],
-     function (model, app, loc, msg, req, Cookies, m)
+     'base/request', 'mithril'],
+     function (model, app, loc, msg, req, m)
 {
     var login = function(name, password) {
         return function(elem) {
@@ -8,7 +8,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
             var login = { name: name, password: password };
             req.sendData(link, login, 'application/json').then(
                 function(token) {
-                    Cookies.set("tokenId", token.id);
+                    sessionStorage.tokenId = token.id;
                     model.loadUser(token.userId);
                 },
                 app.errorHandler(model));
@@ -18,10 +18,10 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
     var logout = function(event) {
         $(event.target).popup('destroy');
         var link = model.vm.getLink("token", "DELETE", model.tokenContentType);
-        link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId")));
+        link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, sessionStorage.tokenId));
         req.sendLink(link, {}, undefined).then(
             function(token) {
-                Cookies.remove("tokenId");
+                sessionStorage.removeItem("tokenId");
                 model.vm.loginComponent(model.loginComponent);
                 model.vm.loggedInUser("");
                 m.route(m.route(), undefined, true);

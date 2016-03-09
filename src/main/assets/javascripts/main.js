@@ -1,9 +1,8 @@
 (function(requirejs) {
     "use strict";
 
-    function gC(k){return(document.cookie.match('(^|; )'+k+'=([^;]*)')||0)[2];}
-
-    var lang = gC("lang");
+    var isStorage = typeof(Storage) !== "undefined";
+    var lang = isStorage ? localStorage.lang : undefined;
 
     requirejs.config({
         optimize: "none",
@@ -13,8 +12,7 @@
         paths: {
             'mithril': '../lib/mithril/mithril.min',
             'semantic': '../lib/Semantic-UI/semantic.min',
-            'jquery': '../lib/jquery/jquery.min',
-            'cookie': '../third/cookie/js.cookie'
+            'jquery': '../lib/jquery/jquery.min'
         },
         shim: {
             'semantic': {

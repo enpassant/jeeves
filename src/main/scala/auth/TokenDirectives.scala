@@ -20,9 +20,11 @@ object TokenDirectives extends CommentDirectives
 
   val modelToken = Supervisor.getChild(ModelToken.name)
 
-  def optionalToken: Directive1[Option[Token]] = optionalCookie("tokenId") flatMap {
+  def optionalToken: Directive1[Option[Token]] =
+    optionalHeaderValueByName("X-Auth-Token") flatMap
+  {
     case Some(tokenId) =>
-      onSuccess((modelToken ? GetEntity[Token](tokenId.value))) flatMap {
+      onSuccess((modelToken ? GetEntity[Token](tokenId))) flatMap {
         case Some(token: Token) => provide(Some(token))
         case _ => provide(None)
       }
