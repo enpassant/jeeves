@@ -10,6 +10,7 @@ import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.{Directive1, Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
+import com.github.rjeschke.txtmark.Processor
 import java.util.UUID
 import org.joda.time.DateTime
 import scala.concurrent.Future
@@ -65,7 +66,20 @@ object BlogDirectives extends CommentDirectives
         respondBlogLinks(blogId, itemMethods:_*) {
           headComplete ~
           Right.checkRight(optUser, Authenticated) {
-            getEntity[Blog](modelBlog, blogId)
+            get {
+              parameters('forEdit ? false) { (forEdit: Boolean) =>
+                ctx => (modelBlog ? GetEntity(blogId)) flatMap {
+                  case Some(entity: Blog) => if (forEdit) {
+                    ctx.complete(entity)
+                  } else {
+                    val blog = entity.copy(note = Processor.process(entity.note))
+                    ctx.complete(blog)
+                  }
+                  case None => ctx.reject()
+                }
+              }
+            }
+            //getEntity[Blog](modelBlog, blogId)
           } ~
           Right.checkRight(optUser, putRight) {
             putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
@@ -105,7 +119,7 @@ object BlogDirectives extends CommentDirectives
 
   def blogListLink(rel: String, methods: List[HttpMethod] = List(GET)) =
     collectionLink("/blogs", rel, "List Blogs",
-      "accountId date:date title note", methods:_*)
+      "title accountId date:date", methods:_*)
 
   def blogItemLink(rel: String, blogId: String = ":blogId",
     methods: List[HttpMethod] = List(GET)) =
@@ -115,7 +129,7 @@ object BlogDirectives extends CommentDirectives
   def blogLinks(optUser: Option[User]) = {
     respondWithLinks(
       collectionLink("/blogs", "blogs", "List Blogs",
-        "accountId date:date title note", GET)
+        "title accountId date:date", GET)
     )
   }
 }

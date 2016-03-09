@@ -12,7 +12,7 @@ class ModelBlog(val mode: Option[String]) extends Actor {
   val tableBlog = (for {
     x <- 1 to 100
   } yield Blog(x.toString, "jim", new DateTime().minusDays(101-x),
-    s"Title ${x}", s"Description ${x}. Mode: ${mode}")).reverse
+    s"Title ${x}", s"#Title ${x}.\n* Mode: ${mode}\n* new item")).reverse
 
   def receive: Receive = process(tableBlog)
 

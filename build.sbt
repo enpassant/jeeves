@@ -29,6 +29,7 @@ libraryDependencies ++= Seq(
   "org.webjars"             % "Semantic-UI"             % "2.1.8",
   "org.webjars"             % "mithril"                 % "0.2.3",
   "org.webjars"             % "jquery"                  % "2.2.1",
+  "com.github.rjeschke"     % "txtmark"                 % "0.13",
   "io.spray"               %% "spray-testkit"           % sprayVersion   % "test"
 )
 
