@@ -15,8 +15,8 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
         };
     };
 
-    var logout = function() {
-        $('#logout').popup('destroy');
+    var logout = function(event) {
+        $(event.target).popup('destroy');
         var link = model.vm.getLink("token", "DELETE", model.tokenContentType);
         link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, Cookies.get("tokenId")));
         req.sendLink(link, {}, undefined).then(
@@ -45,7 +45,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
 
     model.loggedInComponent.view = function(ctrl, args) {
         return m("div.right.menu",
-            m("a.item#logout[data-content=" + loc.tr(msg, "Log out") + "]",
+            m("a.item[data-content=" + loc.tr(msg, "Log out") + "]",
                 {onclick: logout, config: function(elem) {
                     $(elem).popup();
                 }}, model.vm.loggedInUser())
@@ -62,6 +62,16 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
                 loc.tr(msg, link.title || ("get " + link.rel)));
         });
         var rightMenu = m.component(model.vm.loginComponent());
-        return m("div.ui.menu.inverted.stackable", menuItems.concat(rightMenu));
+        return m("div.ui.container.grid", [
+            m("div.mobile.only.sixteen.wide.column",
+                m("div.ui.inverted.top.fixed.menu",
+                [ m("div.ui.dropdown.item", {config: function(elem) {
+                    $(elem).dropdown();
+                }}, [ m("i.icon.content") , m("div.menu", menuItems) ])
+                ].concat(rightMenu))),
+            m("div.computer.only.tablet.only.sixteen.wide.column",
+                m("div.ui.inverted.top.fixed.menu",
+                    menuItems.concat(rightMenu)))
+        ]);
     };
 });
