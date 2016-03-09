@@ -6,8 +6,9 @@ import akka.actor.ActorSelection
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Accept, Link, LinkParams, LinkValue, RawHeader}
+import akka.http.scaladsl.model.headers.{Accept, HttpChallenge, Link, LinkParams, LinkValue, RawHeader}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.AuthenticationFailedRejection
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -97,7 +98,9 @@ trait CommonDirectives extends BaseFormats {
       entity(as[T]) { entity => ctx =>
         (model ? AddEntity(entity, ids:_*)) flatMap {
           case entity: U => ctx.complete(entity)
-          case _ => ctx.complete(StatusCodes.Unauthorized)
+          case _ => ctx.reject(new AuthenticationFailedRejection(
+            AuthenticationFailedRejection.CredentialsRejected,
+              HttpChallenge("Token", "Jeeves")))
         }
       }
     }
