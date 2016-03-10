@@ -5,7 +5,7 @@ define(['./model', 'menu', 'base/localization', 'i18n!nls/messages', 'mithril'],
         var editable = ctrl.isEditable() ? "[contenteditable=true]" : "";
         var editIcon = (ctrl.putHref && !ctrl.isEditable()) ?
             m("a.clickable", {onclick: function() {
-                model.vm.loadForEdit().then(function() {
+                model.vm.loadForEdit(ctrl.isEditable).then(function() {
                     ctrl.isEditable(true);
                 });
             }}, m("i.write.icon"))

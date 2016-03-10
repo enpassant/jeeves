@@ -14,10 +14,19 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
 
     model.vm.blog = m.prop({});
 
-    model.vm.loadForEdit = function() {
-        var link = menu.vm.getLink("self", "GET", model.contentType);
-        link.fullUrl += "?forEdit=true";
-        return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog);
+    model.vm.loadForEdit = function(isEditable) {
+        var link = menu.vm.getLink("edit", "GET", model.contentType);
+        if (link) {
+            return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog);
+        } else {
+            var promise = new Promise(function (resolve, reject) {
+                m.startComputation();
+                resolve();
+                isEditable(true);
+                m.endComputation();
+            });
+            return promise;
+        }
     };
 
     model.vm.save = function(ctrl) {

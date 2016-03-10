@@ -106,6 +106,7 @@ object BlogDirectives extends CommentDirectives
   def respondBlogLinks(blogId: String, methods: HttpMethod*) = respondWithLinks(
       blogListLink("blogs"),
       blogItemLink("self", blogId, methods.toList),
+      blogItemLink("edit", blogId + "?forEdit=true", List(GET)),
       commentListLink(blogId, "comments", GET),
       commentItemLink(blogId, "new", GET)
   )
