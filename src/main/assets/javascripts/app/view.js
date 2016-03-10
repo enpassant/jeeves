@@ -15,13 +15,14 @@ define(['./model', './controller', 'menu', 'mithril'],
             model.messages().map(function(msg, idx) {
                 return m("div.ui." + msg.type + "message",
                     { config: function(elem) {
+                        $(elem).off('click');
                         $(elem).on('click', function() {
-                            $(this).closest('.message').transition('fade');
                             var messages = model.messages().filter(
                                 function(msg, i) {
                                     return (idx !== i);
                                 });
                             model.messages(messages);
+                            $(elem).transition("fade");
                         });
                     }}, [
                     m("i.close.icon"),
