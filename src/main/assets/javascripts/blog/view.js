@@ -1,17 +1,17 @@
 define(['./model', 'menu', 'base/localization', 'i18n!nls/messages', 'mithril'],
     function (model, menu, loc, msg, m) {
-    model.view = function(ctrl, args) {
-        var date = loc.format(model.vm.blog().date, 'date');
-        var editable = ctrl.isEditable() ? "[contenteditable=true]" : "";
-        var editIcon = (ctrl.putHref && !ctrl.isEditable()) ?
+    model.view = function(vm, args) {
+        var date = loc.format(vm.blog().date, 'date');
+        var editable = vm.isEditable() ? "[contenteditable=true]" : "";
+        var editIcon = (vm.putHref && !vm.isEditable()) ?
             m("a.clickable", {onclick: function() {
-                model.vm.loadForEdit(ctrl.isEditable).then(function() {
-                    ctrl.isEditable(true);
+                model.loadForEdit(vm).then(function() {
+                    vm.isEditable(true);
                 });
             }}, m("i.write.icon"))
             : "";
-        var deleteButton = ctrl.deleteHref ?
-            m("button.ui.button.right.floated", {onclick: model.vm.delete},
+        var deleteButton = vm.deleteHref ?
+            m("button.ui.button.right.floated", {onclick: model.delete.bind(null, vm)},
                    loc.tr(msg, "Delete"))
             : "";
 
@@ -21,17 +21,17 @@ define(['./model', 'menu', 'base/localization', 'i18n!nls/messages', 'mithril'],
             };
         };
         var noteUI = editable ?
-            m("textarea#blog-note[rows=6]", model.vm.blog().note) :
-            m("div.content", {config: appendHtml(model.vm.blog().note)});
+            m("textarea#blog-note[rows=6]", vm.blog().note) :
+            m("div.content", {config: appendHtml(vm.blog().note)});
 
         return m("div.ui.card", [
             m("div.content", [
                 m("div.header#blog-title" + editable, {config: function(elem) {
                     elem.focus();
-                }}, model.vm.blog().title),
+                }}, vm.blog().title),
                 m("div.meta", [
                     loc.tr(msg, "by") + " " +
-                    model.vm.blog().accountId, m("span.right.floated", date)
+                    vm.blog().accountId, m("span.right.floated", date)
                 ])
             ]),
             noteUI,
@@ -40,7 +40,7 @@ define(['./model', 'menu', 'base/localization', 'i18n!nls/messages', 'mithril'],
             ]),
             m("div.extra.content", [
                 m("button.ui.button.right.floated", {onclick: function() {
-                    model.vm.save(ctrl);
+                    model.save(vm);
                     }},
                     loc.tr(msg, "OK")),
                 editIcon,

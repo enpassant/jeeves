@@ -3,48 +3,37 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
 
     model.contentType = 'application/vnd.enpassant.blog+json';
 
-    model.blog = {};
-
-    model.setBlog = function(blog) {
-        model.blog = blog;
-        model.vm.blog(blog);
-    };
-
-    model.vm = {};
-
-    model.vm.blog = m.prop({});
-
-    model.vm.loadForEdit = function(isEditable) {
+    model.loadForEdit = function(vm) {
         var link = menu.vm.getLink("edit", "GET", model.contentType);
         if (link) {
-            return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog);
+            return req.sendLink(link, {}, menu.vm.setLinks).then(vm.blog);
         } else {
             var promise = new Promise(function (resolve, reject) {
                 m.startComputation();
                 resolve();
-                isEditable(true);
+                vm.isEditable(true);
                 m.endComputation();
             });
             return promise;
         }
     };
 
-    model.vm.save = function(ctrl) {
-        if (!ctrl.isEditable()) {
+    model.save = function(vm) {
+        if (!vm.isEditable()) {
             menu.vm.redirect("blogs", "GET");
         } else {
             var link = menu.vm.getLink("self", "PUT", model.contentType);
-            var blog = model.vm.blog();
+            var blog = vm.blog();
             blog.title = $('#blog-title').text();
             blog.note = $('#blog-note').val();
-            req.sendData(link, model.vm.blog, model.contentType, menu.vm.setLinks).then(
-                model.setBlog).then(function() {
+            req.sendData(link, vm.blog, model.contentType, menu.vm.setLinks).then(
+                vm.blog).then(function() {
                     menu.vm.redirect("blogs", "GET");
                 });
         }
     };
 
-    model.vm.delete = function() {
+    model.delete = function(vm) {
         var link = menu.vm.getLink("self", "DELETE", model.contentType);
         var url = app.fullUri(link.url);
         req.sendLink(link, {}, menu.vm.setLinks).then(function() {
@@ -52,14 +41,16 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         });
     };
 
-    model.vm.init = function() {
+    model.init = function() {
+        this.blog = m.prop({});
+        this.isEditable = m.prop(false);
+
         model.load(this).then(function() {
             this.putHref = menu.vm.getHref("self", "PUT", model.contentType);
             this.deleteHref = menu.vm.getHref("self", "DELETE", model.contentType);
             this.params = m.route.param();
-            this.isEditable = m.prop(false);
             if (this.params.method == "PUT" && this.putHref) {
-                model.vm.loadForEdit().then(function() {
+                model.loadForEdit(this).then(function() {
                     this.isEditable(true);
                 }.bind(this));
             }
@@ -70,15 +61,14 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         var params = m.route.param();
 
         vm.url = app.fullUri(params.path);
-        model.vm.blog = m.prop({});
 
         if (vm.url.indexOf(':') >= 0) {
             return req.head(vm.url, menu.vm.setLinks).then(
                 menu.initToken, app.errorHandler(menu));
         } else {
             var link = {method: "GET", fullUrl: vm.url, type: model.contentType};
-            return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog).then(
-                menu.initToken, app.errorHandler(menu));
+            return req.sendLink(link, {}, menu.vm.setLinks).then(vm.blog).then(
+                    menu.initToken, app.errorHandler(menu));
         }
     };
 
