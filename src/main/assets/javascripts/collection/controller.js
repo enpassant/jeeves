@@ -10,8 +10,9 @@ define(['./model', 'mithril', 'jquery'], function (model, m, $) {
 
         this.deleteItem = function(link, id) {
             var vm = this;
-            var $dialog = $('.ui.modal.delete');
+            var $dialog = $('#dlgModalDelete');
             $dialog.modal({
+                detachable: false,
                 onApprove : function() {
                     model.deleteItem(vm, link, id);
                 }

@@ -56,14 +56,14 @@ define(['./model', 'app/model', 'base/localization', 'jquery',
                         columnValueUI.push(m("td", operations));
                         return m("tr", {key: id}, columnValueUI);
                     })
-                ]),
-                m("div.ui.modal.delete", [
-                    m("div.content", m("p", "Are you sure you want to delete?")),
-                    m("div.actions", [
-                        m("div.ui.black.deny.button", loc.tr(msg, "No")),
-                        m("div.ui.positive.right.labeled.icon.button", [
-                            m("i.checkmark.icon"), loc.tr(msg, "Yes")
-                        ])
+                ])
+            ]),
+            m("div.ui.modal.delete.hidden#dlgModalDelete", [
+                m("div.content", m("p", "Are you sure you want to delete?")),
+                m("div.actions", [
+                    m("div.ui.black.deny.button", loc.tr(msg, "No")),
+                    m("div.ui.positive.right.labeled.icon.button", [
+                        m("i.checkmark.icon"), loc.tr(msg, "Yes")
                     ])
                 ])
             ])
