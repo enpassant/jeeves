@@ -31,7 +31,20 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
             operations.push(m("a", {href: href, config: m.route}, m("i.add.circle.icon")));
         }
         columnsUI.push(m("th", operations));
-        return m("div", [
+        return m("div", { config: function(elem) {
+            $(elem)
+              .visibility({
+                once: false,
+                // update size when new content loads
+                observeChanges: true,
+                // load content on bottom edge visible
+                onBottomVisible: function() {
+                  // loads a max of 5 times
+                  model.append();
+                }
+              })
+            ;            
+            }}, [
             m("table.ui.compact.striped.table", [
                 m("thead", [
                     m("tr", columnsUI)

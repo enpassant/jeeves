@@ -35,9 +35,9 @@ define(['mithril'], function (m) {
                 throw xhr;
             }
             try {
-                var links = xhr.getResponseHeader("Link").split(",");
+                var links = xhr.getResponseHeader("Link");
                 if (links) {
-                    var linkObjs = links.map(parseLink);
+                    var linkObjs = links.split(",").map(parseLink);
                     linkVar(linkObjs);
                 }
                 var resp = xhr.responseText;

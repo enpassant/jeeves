@@ -63,7 +63,7 @@ trait CommonDirectives extends BaseFormats {
   def getList[T: ClassTag](model: ActorSelection, t: Any)(params: Any*)
     (implicit m: ToEntityMarshaller[Seq[T]]) = get
   {
-    parameters('offset ? 0, 'limit ? 3) { (offset: Int, limit: Int) =>
+    parameters('offset ? 0, 'limit ? 5) { (offset: Int, limit: Int) =>
       { ctx =>
         (model ? ListWithOffset(t, params, offset, limit)) flatMap {
           case EntityList(slice: Iterable[T @unchecked]) => ctx.complete(slice.toSeq)

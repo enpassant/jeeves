@@ -6,7 +6,10 @@ define(['./model', 'menu', 'collection', 'blog', 'mithril'],
 
         if (params.path) {
             if (params.componentName && components[params.componentName]) {
-                this.component = components[params.componentName];
+                if (model.component && model.component.clean) {
+                    model.component.clean();
+                }
+                model.component = this.component = components[params.componentName];
                 this.component.load(model.fullUri(params.path)).then(
                     menu.initToken, model.errorHandler(menu));
             }
