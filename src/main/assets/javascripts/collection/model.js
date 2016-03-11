@@ -13,9 +13,6 @@ define(['menu', 'base/request', 'mithril'], function (menu, req, m) {
 
     model.vm.rows = m.prop([]);
 
-    model.vm.init = function() {
-    };
-
     var appendRows = function(rows) {
         if (rows.length > 0) {
             model.vm.rows(model.vm.rows().concat(rows));
@@ -35,8 +32,7 @@ define(['menu', 'base/request', 'mithril'], function (menu, req, m) {
 
     model.load = function(url) {
         model.vm.url = url;
-        var link = {method: "GET", fullUrl: url,
-            type: model.contentType};
+        var link = {method: "GET", fullUrl: url, type: model.contentType};
         return req.sendLink(link, {}, menu.vm.setLinks).then(model.vm.rows);
     };
 

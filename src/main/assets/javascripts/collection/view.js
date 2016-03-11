@@ -1,25 +1,8 @@
-define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jquery',
+define(['./model', 'menu', 'base/localization', 'jquery',
     'mithril', 'i18n!nls/messages', 'semantic'],
-     function (model, app, menu, loc, req, $, m, msg)
+     function (model, menu, loc, $, m, msg)
 {
-    var deleteItem = function(link, id) {
-        return function(elem) {
-            var $dialog = $('.ui.modal.delete');
-            $dialog.modal({
-                onApprove : function() {
-                    m.startComputation();
-                    var params = m.route.param();
-                    link.fullUrl = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
-                    req.sendLink(link, {}, menu.vm.setLinks).then(function() {
-                        model.load(app.fullUri(params.path));
-                    });
-                    m.endComputation();
-                }
-            }).modal('show');
-        };
-    };
-
-    model.view = function() {
+    model.view = function(vm) {
         var link = menu.vm.getLink("self", "GET", model.contentType);
         var columns = menu.vm.getColumns(link);
         var columnsUI = columns.map(function(column, i) {
@@ -35,15 +18,12 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
             $(elem)
               .visibility({
                 once: false,
-                // update size when new content loads
                 observeChanges: true,
-                // load content on bottom edge visible
                 onBottomVisible: function() {
-                  // loads a max of 5 times
                   model.append();
                 }
               })
-            ;            
+            ;
             }}, [
             m("table.ui.compact.striped.table", [
                 m("thead", [
@@ -69,11 +49,12 @@ define(['./model', 'app/model', 'menu', 'base/localization', 'base/request', 'jq
                         }
                         link = menu.vm.getLink("item", "DELETE");
                         if (link) {
-                            operations.push(m("a.clickable", {onclick: deleteItem(link, id)},
+                            operations.push(m("a.clickable",
+                                {onclick: vm.deleteItem.bind(this, link, id)},
                                 m("i.trash.outline.icon")));
                         }
                         columnValueUI.push(m("td", operations));
-                        return m("tr", columnValueUI);
+                        return m("tr", {key: row[0]}, columnValueUI);
                     })
                 ]),
                 m("div.ui.modal.delete", [
