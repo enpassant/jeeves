@@ -9,12 +9,11 @@ define(['./model', 'mithril', 'jquery'], function (model, m, $) {
         model.load(this);
 
         this.deleteItem = function(link, id) {
+            var vm = this;
             var $dialog = $('.ui.modal.delete');
             $dialog.modal({
                 onApprove : function() {
-                    m.startComputation();
-                    model.deleteItem(link, id);
-                    m.endComputation();
+                    model.deleteItem(vm, link, id);
                 }
             }).modal('show');
         };

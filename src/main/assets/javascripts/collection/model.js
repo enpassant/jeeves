@@ -28,7 +28,7 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
             var offset = vm.rows().length;
             var link = {method: "GET", fullUrl: vm.url + "?offset=" + offset,
                 type: model.contentType};
-            return req.sendLink(link, {}, menu.vm.setLinks).then(appendRows.bind(null, vm));
+            return req.sendLink(link, {}, app.setLinks).then(appendRows.bind(null, vm));
         }
     };
 
@@ -37,15 +37,15 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
 
         vm.url = app.fullUri(params.path);
         var link = {method: "GET", fullUrl: vm.url, type: model.contentType};
-        return req.sendLink(link, {}, menu.vm.setLinks).then(vm.rows).then(
+        return req.sendLink(link, {}, app.setLinks).then(vm.rows).then(
             menu.initToken, app.errorHandler(menu));
     };
 
-    model.deleteItem = function(link, id) {
+    model.deleteItem = function(vm, link, id) {
         var params = m.route.param();
         link.fullUrl = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
-        return req.sendLink(link, {}, menu.vm.setLinks).then(function() {
-            return model.load(app.fullUri(params.path));
+        return req.sendLink(link, {}, app.setLinks).then(function() {
+            return model.load(vm);
         });
     };
 

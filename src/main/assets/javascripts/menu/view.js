@@ -4,7 +4,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
 {
     var login = function(name, password) {
         return function(elem) {
-            var link = model.vm.getLink("login", "POST", model.tokenContentType);
+            var link = app.getLink("login", "POST", model.tokenContentType);
             var login = { name: name, password: password };
             req.sendData(link, login, 'application/json').then(
                 function(token) {
@@ -17,7 +17,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
 
     var logout = function(event) {
         $(event.target).popup('destroy');
-        var link = model.vm.getLink("token", "DELETE", model.tokenContentType);
+        var link = app.getLink("token", "DELETE", model.tokenContentType);
         link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, sessionStorage.tokenId));
         req.sendLink(link, {}, undefined).then(
             function(token) {
@@ -53,11 +53,11 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
     };
 
     model.view = function() {
-        var menuItems = model.vm.links().filter(function(link) {
+        var menuItems = app.links().filter(function(link) {
             return link.title && link.method === 'GET';
         }).map(function(link) {
             return m("a.item", {
-                href: model.vm.getLinkHref(link),
+                href: app.getLinkHref(link),
                 config: m.route},
                 loc.tr(msg, link.title || ("get " + link.rel)));
         });

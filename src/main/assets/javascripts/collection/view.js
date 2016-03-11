@@ -1,15 +1,15 @@
-define(['./model', 'menu', 'base/localization', 'jquery',
+define(['./model', 'app/model', 'base/localization', 'jquery',
     'mithril', 'i18n!nls/messages', 'semantic'],
-     function (model, menu, loc, $, m, msg)
+     function (model, app, loc, $, m, msg)
 {
     model.view = function(vm) {
-        var link = menu.vm.getLink("self", "GET", model.contentType);
+        var link = app.getLink("self", "GET", model.contentType);
         var columns = model.getColumns(link);
         var columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(msg, column.name));
         });
         var operations = [ m("i.configure.icon") ];
-        var href = menu.vm.getHref("new", "GET");
+        var href = app.getHref("new", "GET");
         if (href) {
             operations.push(m("a", {href: href, config: m.route}, m("i.add.circle.icon")));
         }
@@ -37,24 +37,24 @@ define(['./model', 'menu', 'base/localization', 'jquery',
                                    loc.format(row[column.name], column.type) : "");
                         });
                         var operations = [];
-                        href = menu.vm.getHref("item", "GET", undefined, id);
+                        href = app.getHref("item", "GET", undefined, id);
                         if (href) {
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.unhide.icon")));
                         }
-                        href = menu.vm.getHref("item", "PUT", undefined, id);
+                        href = app.getHref("item", "PUT", undefined, id);
                         if (href) {
                             operations.push(m("a", {href: href, config: m.route},
                                 m("i.write.icon")));
                         }
-                        link = menu.vm.getLink("item", "DELETE");
+                        link = app.getLink("item", "DELETE");
                         if (link) {
                             operations.push(m("a.clickable",
-                                {onclick: vm.deleteItem.bind(this, link, id)},
+                                {onclick: vm.deleteItem.bind(vm, link, id)},
                                 m("i.trash.outline.icon")));
                         }
                         columnValueUI.push(m("td", operations));
-                        return m("tr", {key: row[0]}, columnValueUI);
+                        return m("tr", {key: id}, columnValueUI);
                     })
                 ]),
                 m("div.ui.modal.delete", [
