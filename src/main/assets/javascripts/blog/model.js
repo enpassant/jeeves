@@ -53,28 +53,34 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     };
 
     model.vm.init = function() {
-        this.putHref = menu.vm.getHref("self", "PUT", model.contentType);
-        this.deleteHref = menu.vm.getHref("self", "DELETE", model.contentType);
-        this.params = m.route.param();
-        this.isEditable = m.prop(false);
-        ctrl = this;
-        if (this.params.method == "PUT" && this.putHref) {
-            model.vm.loadForEdit().then(function() {
-                ctrl.isEditable(true);
-            });
-        }
+        model.load(this).then(function() {
+            this.putHref = menu.vm.getHref("self", "PUT", model.contentType);
+            this.deleteHref = menu.vm.getHref("self", "DELETE", model.contentType);
+            this.params = m.route.param();
+            this.isEditable = m.prop(false);
+            if (this.params.method == "PUT" && this.putHref) {
+                model.vm.loadForEdit().then(function() {
+                    this.isEditable(true);
+                }.bind(this));
+            }
+        }.bind(this));
 
         return this;
     };
 
-    model.load = function(url) {
+    model.load = function(vm) {
+        var params = m.route.param();
+
+        vm.url = app.fullUri(params.path);
         model.vm.blog = m.prop({});
 
-        if (url.indexOf(':') >= 0) {
-            return req.head(url, menu.vm.setLinks);
+        if (vm.url.indexOf(':') >= 0) {
+            return req.head(vm.url, menu.vm.setLinks).then(
+                menu.initToken, app.errorHandler(menu));
         } else {
-            var link = {method: "GET", fullUrl: url, type: model.contentType};
-            return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog);
+            var link = {method: "GET", fullUrl: vm.url, type: model.contentType};
+            return req.sendLink(link, {}, menu.vm.setLinks).then(model.setBlog).then(
+                menu.initToken, app.errorHandler(menu));
         }
     };
 

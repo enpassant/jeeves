@@ -6,7 +6,7 @@ define(['./model', './controller', 'menu', 'mithril'],
 
         var componentUi = (component) ?
             m("div.ui.basic.segment", [
-                m.component(component, ctrl)
+                m(component)
             ]) : "";
 
         var outdatedBrowserUI = m("The browser is outdated");

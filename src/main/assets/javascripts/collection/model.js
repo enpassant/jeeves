@@ -1,39 +1,40 @@
-define(['menu', 'base/request', 'mithril'], function (menu, req, m) {
+define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, req, m) {
     var model = {};
 
     model.contentType = 'application/collection+json';
 
-    model.appendable = true;
-
-    model.clean = function() {
-        model.appendable = true;
-    };
-
-    model.vm = {};
-
-    model.vm.rows = m.prop([]);
-
-    var appendRows = function(rows) {
+    var appendRows = function(vm, rows) {
         if (rows.length > 0) {
-            model.vm.rows(model.vm.rows().concat(rows));
+            vm.rows(vm.rows().concat(rows));
         } else {
-            model.appendable = false;
+            vm.appendable = false;
         }
     };
 
-    model.append = function() {
-        if (model.appendable) {
-            var offset = model.vm.rows().length;
-            var link = {method: "GET", fullUrl: model.vm.url + "?offset=" + offset,
+    model.append = function(vm) {
+        if (vm.appendable) {
+            var offset = vm.rows().length;
+            var link = {method: "GET", fullUrl: vm.url + "?offset=" + offset,
                 type: model.contentType};
-            return req.sendLink(link, {}, menu.vm.setLinks).then(appendRows);
+            return req.sendLink(link, {}, menu.vm.setLinks).then(appendRows.bind(null, vm));
         }
     };
 
-    model.load = function(url) {
-        model.vm.url = url;
-        var link = {method: "GET", fullUrl: url, type: model.contentType};
-        return req.sendLink(link, {}, menu.vm.setLinks).then(model.vm.rows);
+    model.load = function(vm) {
+        var params = m.route.param();
+
+        vm.url = app.fullUri(params.path);
+        var link = {method: "GET", fullUrl: vm.url, type: model.contentType};
+        return req.sendLink(link, {}, menu.vm.setLinks).then(vm.rows).then(
+            menu.initToken, app.errorHandler(menu));
+    };
+
+    model.deleteItem = function(link, id) {
+        var params = m.route.param();
+        link.fullUrl = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
+        return req.sendLink(link, {}, menu.vm.setLinks).then(function() {
+            return model.load(app.fullUri(params.path));
+        });
     };
 
     return model;

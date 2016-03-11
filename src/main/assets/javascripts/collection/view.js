@@ -20,7 +20,7 @@ define(['./model', 'menu', 'base/localization', 'jquery',
                 once: false,
                 observeChanges: true,
                 onBottomVisible: function() {
-                  model.append();
+                  model.append(vm);
                 }
               })
             ;
@@ -30,7 +30,7 @@ define(['./model', 'menu', 'base/localization', 'jquery',
                     m("tr", columnsUI)
                 ]),
                 m("tbody", [
-                    model.vm.rows().map(function(row, index) {
+                    vm.rows().map(function(row, index) {
                         var id = row[Object.keys(row)[0]];
                         var columnValueUI = columns.map(function(column, i) {
                             return m("td", row[column.name] ?
