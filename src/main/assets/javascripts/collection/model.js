@@ -3,6 +3,8 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
 
     model.contentType = 'application/collection+json';
 
+    app.components.collection = model;
+
     var appendRows = function(vm, rows) {
         if (rows.length > 0) {
             vm.rows(vm.rows().concat(rows));

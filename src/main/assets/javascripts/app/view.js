@@ -47,9 +47,4 @@ define(['./model', './controller', 'menu', 'mithril'],
 
         return isStorage ? appUI : outdatedBrowserUI;
     };
-
-    m.route(document.body, "/", {
-        "/": model,
-        "/:componentName": model
-    });
 });

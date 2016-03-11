@@ -85,5 +85,7 @@ define(['base/request', 'mithril'], function (req, m) {
         return model.getLinkHref(link, id);
     };
 
+    model.components = {};
+
     return model;
 });

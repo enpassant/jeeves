@@ -54,7 +54,7 @@ define(['./model', 'app/model', 'base/localization', 'jquery',
                                 m("i.trash.outline.icon")));
                         }
                         columnValueUI.push(m("td", operations));
-                        return m("tr", {key: id}, columnValueUI);
+                        return m("tr", columnValueUI);
                     })
                 ])
             ]),

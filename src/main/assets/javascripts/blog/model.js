@@ -3,6 +3,8 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
 
     model.contentType = 'application/vnd.enpassant.blog+json';
 
+    app.components['vnd.enpassant.blog'] = model;
+
     model.loadForEdit = function(vm) {
         var link = app.getLink("edit", "GET", model.contentType);
         if (link) {

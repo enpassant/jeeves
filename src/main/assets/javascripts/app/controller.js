@@ -5,16 +5,11 @@ define(['./model', 'menu', 'collection', 'blog', 'mithril'],
         var params = m.route.param();
 
         if (params.path) {
-            if (params.componentName && components[params.componentName]) {
-                this.component = components[params.componentName];
+            if (params.componentName && model.components[params.componentName]) {
+                this.component = model.components[params.componentName];
             }
         } else {
             menu.load(model.fullUri('/')).then(menu.initToken, model.errorHandler(menu));
         }
-    };
-
-    var components = {
-        'collection': collection,
-        'vnd.enpassant.blog': blog
     };
 });

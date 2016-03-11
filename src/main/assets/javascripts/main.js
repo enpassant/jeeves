@@ -10,7 +10,7 @@
         keepBuildDir: "true",
         packages: ['app', 'menu', 'collection', 'blog'],
         paths: {
-            'mithril': '../lib/mithril/mithril.min',
+            'mithril': '../lib/mithril/mithril',
             'semantic': '../lib/Semantic-UI/semantic.min',
             'jquery': '../lib/jquery/jquery.min'
         },
@@ -42,6 +42,10 @@
         console.log(err);
     };
 
-    require(['jquery', 'semantic', 'app'], function ($, semantic, app) {
+    require(['app', 'mithril'], function (app, m) {
+        m.route(document.body, "/", {
+            "/": app,
+            "/:componentName": app
+        });
     });
 })(requirejs);
