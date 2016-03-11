@@ -64,8 +64,6 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
                 }.bind(this));
             }
         }.bind(this));
-
-        return this;
     };
 
     model.load = function(vm) {
