@@ -11,6 +11,18 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
         }
     };
 
+    model.getColumns = function(link) {
+        var columns = link ? link.columns.split(" ") : [];
+        return columns.map(function(column) {
+            var arr = column.split(":");
+            if (arr.length >= 2) {
+                return { name: arr[0], type: arr[1] };
+            } else {
+                return { name: arr[0], type: "string" };
+            }
+        });
+    };
+
     model.append = function(vm) {
         if (vm.appendable) {
             var offset = vm.rows().length;

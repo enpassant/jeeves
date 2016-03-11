@@ -31,18 +31,6 @@ define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
         model.vm.links(links);
     };
 
-    model.vm.getColumns = function(link) {
-        var columns = link ? link.columns.split(" ") : [];
-        return columns.map(function(column) {
-            var arr = column.split(":");
-            if (arr.length >= 2) {
-                return { name: arr[0], type: arr[1] };
-            } else {
-                return { name: arr[0], type: "string" };
-            }
-        });
-    };
-
     model.vm.getLink = function(rel, method, contentType) {
         return model.vm.links().find(function(link) {
             return (link.rel === rel && link.method === method &&

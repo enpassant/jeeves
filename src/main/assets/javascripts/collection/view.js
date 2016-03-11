@@ -4,7 +4,7 @@ define(['./model', 'menu', 'base/localization', 'jquery',
 {
     model.view = function(vm) {
         var link = menu.vm.getLink("self", "GET", model.contentType);
-        var columns = menu.vm.getColumns(link);
+        var columns = model.getColumns(link);
         var columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(msg, column.name));
         });
