@@ -26,7 +26,6 @@ define([], function() {
                 }
             },
             trigger: function(channel, args) {
-                console.log("triggered: " + channel);
                 channels[channel].map(function(callback) {
                     callback(args);
                 });
