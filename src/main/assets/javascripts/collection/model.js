@@ -5,7 +5,13 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
 
     app.components.collection = model;
 
+    function handleError(vm, error) {
+        vm.appendable = false;
+        app.errorHandler(menu)(error);
+    }
+
     var appendRows = function(vm, rows) {
+        console.log(vm.appendable);
         if (rows.length > 0) {
             vm.rows(vm.rows().concat(rows));
         } else {
@@ -30,7 +36,8 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
             var offset = vm.rows().length;
             var link = {method: "GET", fullUrl: vm.url + "?offset=" + offset,
                 type: model.contentType};
-            return req.sendLink(link, {}, app.setLinks).then(appendRows.bind(null, vm));
+            return req.sendLink(link, {}, app.setLinks).then(appendRows.bind(null, vm),
+                handleError.bind(null, vm));
         }
     };
 
@@ -40,7 +47,7 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
         vm.url = app.fullUri(params.path);
         var link = {method: "GET", fullUrl: vm.url, type: model.contentType};
         return req.sendLink(link, {}, app.setLinks).then(vm.rows).then(
-            menu.initToken, app.errorHandler(menu));
+            menu.initToken, handleError.bind(null, vm));
     };
 
     model.deleteItem = function(vm, link, id) {
