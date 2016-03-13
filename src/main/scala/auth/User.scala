@@ -34,7 +34,7 @@ trait UserFormats extends BaseFormats {
     marshaller[User](MediaTypes.`application/json`))
 
   implicit val SeqUserMarshaller = marshaller[Seq[User]](
-    MediaTypes.`application/json`)
+    `application/collection+json`)
 
   implicit val LoginUnmarshaller = Unmarshaller.firstOf(
     unmarshaller[Login](`application/vnd.enpassant.login+json`),

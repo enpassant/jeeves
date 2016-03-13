@@ -14,9 +14,15 @@ import org.joda.time.DateTime
 object UserDirectives extends CommonDirectives with BlogFormats with UserFormats {
   val modelUser = Supervisor.getChild(ModelUser.name)
 
-  def handleUsers() = pathEnd {
-    headComplete ~
-    getList[User](modelUser, User)()
+  def handleUsers(optUser: Option[User]) = pathEnd {
+    val links = Right.mapActions(optUser, Map(
+      userListLink("self") -> Authenticated
+    ))
+
+    respondWithLinks(links:_*) {
+      headComplete ~
+      getList[User](modelUser, User)()
+    }
   } ~
   pathPrefix(Segment)(handleUser)
 
@@ -35,9 +41,13 @@ object UserDirectives extends CommonDirectives with BlogFormats with UserFormats
     mtLink(s"/users/$userId", rel,
       `application/vnd.enpassant.user+json`, methods:_*)
 
-  def userMenuLinks() = respondWithLinks(
-    collectionLink(s"/users", "users", "List Users", "login name", GET)
-  )
+  def userMenuLinks(optUser: Option[User]) = {
+    val links = Right.mapActions(optUser, Map(
+      collectionLink(s"/users", "users", "List Users", "login name", GET) -> Authenticated
+    ))
+
+    respondWithLinks(links:_*)
+  }
 
   def userItemLinks() = respondWithLinks(
     mtLink(s"/users/:userId", "user", `application/vnd.enpassant.user+json`, GET)

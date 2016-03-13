@@ -45,7 +45,7 @@ class Service(val config: Config, val routerDefined: Boolean)
         pathPrefix("api") {
           optionalToken { optToken =>
             optionalUser(optToken) { optUser =>
-              (blogLinks(optUser) & tokenLinks & userMenuLinks & userItemLinks) {
+              (blogLinks(optUser) & tokenLinks & userMenuLinks(optUser) & userItemLinks) {
                 headComplete
               } ~
               (tokenLinks & userItemLinks) {
@@ -56,7 +56,7 @@ class Service(val config: Config, val routerDefined: Boolean)
                   handleTokens
                 } ~
                 pathPrefix("users") {
-                  handleUsers()
+                  handleUsers(optUser)
                 }
               }
             }
