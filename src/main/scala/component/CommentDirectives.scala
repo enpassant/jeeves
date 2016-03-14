@@ -14,8 +14,13 @@ import org.joda.time.DateTime
 trait CommentDirectives extends CommonDirectives with BlogFormats with CommentFormats {
   val modelComment = Supervisor.getChild(ModelComment.name)
 
-  def handleComments(blogId: String) = pathEnd {
-    commentLinks(blogId) {
+  def handleComments(optUser: Option[User], blogId: String) = pathEnd {
+    val links = Right.mapActions(optUser, Map(
+      commentListLink(blogId, "self") -> Authenticated,
+      commentItemLink(blogId, "item") -> Authenticated,
+      commentItemLink(blogId, "new", "new") -> Authenticated))
+
+    respondWithLinks(links:_*) {
       headComplete ~
       getList[Comment](modelComment, Comment)(blogId)
     }
@@ -30,12 +35,13 @@ trait CommentDirectives extends CommonDirectives with BlogFormats with CommentFo
     }
   }
 
-  def commentListLink(blogId: String, rel: String, methods: HttpMethod*) =
+  def commentListLink(blogId: String, rel: String, methods: List[HttpMethod] = List(GET)) =
     collectionLink(s"/blogs/$blogId/comments", rel, "List Comments",
       "accountId date:date title note", methods:_*)
 
-  def commentItemLink(blogId: String, rel: String, methods: HttpMethod*) =
-    mtLink(s"/blogs/$blogId/comments/:commentId", rel,
+  def commentItemLink(blogId: String, rel: String, commentId: String = ":commentId",
+    methods: List[HttpMethod] = List(GET)) =
+    mtLink(s"/blogs/$blogId/comments/$commentId", rel,
       `application/vnd.enpassant.comment+json`, methods:_*)
 
   def commentLinks(blogId: String) = respondWithLinks(

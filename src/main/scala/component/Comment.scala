@@ -29,5 +29,5 @@ trait CommentFormats extends BaseFormats {
     marshaller[Comment](MediaTypes.`application/json`))
 
   implicit val SeqCommentMarshaller = marshaller[Seq[Comment]](
-    MediaTypes.`application/json`)
+    `application/collection+json`)
 }

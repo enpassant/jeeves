@@ -99,7 +99,7 @@ object BlogDirectives extends CommentDirectives
     }
   } ~
   pathPrefix("comments") {
-    blogLinks(optUser) { handleComments(blogId) } ~
+    blogLinks(optUser) { handleComments(optUser, blogId) } ~
     pathPrefix(Segment)(handleComment(blogId) _)
   }
 
@@ -107,8 +107,8 @@ object BlogDirectives extends CommentDirectives
       blogListLink("blogs"),
       blogItemLink("self", blogId, methods.toList),
       blogItemLink("edit", blogId + "?forEdit=true", List(GET)),
-      commentListLink(blogId, "comments", GET),
-      commentItemLink(blogId, "new", GET)
+      commentListLink(blogId, "comments"),
+      commentItemLink(blogId, "new", "new", List(GET))
   )
 
   def getBlogDirective(blogId: String): Directive1[Option[Blog]] = {
