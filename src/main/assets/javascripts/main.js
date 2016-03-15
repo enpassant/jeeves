@@ -5,7 +5,7 @@
     var lang = isStorage ? localStorage.lang : undefined;
 
     requirejs.config({
-        optimize: "none",
+        optimize: "uglify2",
         skipDirOptimize: "true",
         keepBuildDir: "true",
         packages: ['app', 'menu', 'collection', 'blog'],
