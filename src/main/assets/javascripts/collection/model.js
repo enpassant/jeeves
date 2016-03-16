@@ -11,7 +11,6 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
     }
 
     var appendRows = function(vm, rows) {
-        console.log(vm.appendable);
         if (rows.length > 0) {
             vm.rows(vm.rows().concat(rows));
         } else {

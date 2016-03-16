@@ -61,7 +61,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
                 href: app.getLinkHref(link),
                 config: m.route},
                 loc.tr(msg, link.title || ("get " + link.rel)));
-        });
+        }).toArray();
         var rightMenu = m.component(model.vm.loginComponent());
         return m("div.ui.container.grid", [
             m("div.mobile.only.sixteen.wide.column",

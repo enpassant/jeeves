@@ -1,5 +1,5 @@
-define(['base/request', 'mithril'], function (req, m) {
-    var model = {};
+define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
+    const model = {};
 
     model.restUri = m.prop("/api");
 
@@ -12,11 +12,13 @@ define(['base/request', 'mithril'], function (req, m) {
 
     model.errorHandler = function(menu, action, fn) {
         return function(error) {
-            var messages = model.messages();
-            var type = error.status >= 400 ? "error." : "warning.";
-            var msg = new model.Message(error.statusText, error.responseText, type, action);
-            messages.push(msg);
-            model.messages(messages);
+            const messages = model.messages();
+            const type = error.status >= 400 ? "error." : "warning.";
+            const msg = Immutable.Map(
+                new model.Message(error.statusText, error.responseText, type, action)
+            );
+            const newMessages = messages.push(msg);
+            model.messages(newMessages);
 
             if (menu && error.status === 401) {
                 menu.removeToken();
@@ -28,31 +30,22 @@ define(['base/request', 'mithril'], function (req, m) {
         return model.restUri() + uri;
     };
 
-    model.messages = m.prop([]);
+    model.messages = m.prop(Immutable.List([]));
 
-    model.links = m.prop([]);
-
-    function clone(obj) {
-        if (null === obj || "object" != typeof obj) return obj;
-        var copy = obj.constructor();
-        for (var attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-        }
-        return copy;
-    }
+    model.links = m.prop(Immutable.List([]));
 
     model.setLinks = function(arr) {
-        var links = [];
+        const links = [];
         for (var i = 0, len = arr.length; i < len; i++) {
-            var methods = arr[i].method.split(" ");
+            const methods = arr[i].method.split(" ");
             for (var j = 0, len2 = methods.length; j < len2; j++) {
-                var link = clone(arr[i]);
-                link.fullUrl = model.fullUri(link.url);
-                link.method = methods[j];
-                links.push(link);
+                const link = Immutable.Map(arr[i])
+                    .set("fullUrl", model.fullUri(arr[i].url))
+                    .set("method", methods[j]);
+                links.push(link.toJS());
             }
         }
-        model.links(links);
+        model.links(Immutable.List(links));
     };
 
     model.getLink = function(rel, method, contentType) {
@@ -63,7 +56,7 @@ define(['base/request', 'mithril'], function (req, m) {
     };
 
     model.redirect = function(rel, method) {
-        var href = model.getHref(rel, method);
+        const href = model.getHref(rel, method);
         if (href) return m.route(href);
     };
 
@@ -73,7 +66,7 @@ define(['base/request', 'mithril'], function (req, m) {
 
     model.getLinkHref = function(link, id) {
         if (link) {
-            var url = id ? link.url.replace(/:[a-zA-Z0-9]+/, id) : link.url;
+            const url = id ? link.url.replace(/:[a-zA-Z0-9]+/, id) : link.url;
             return "/" + model.getComponent(link.type) +
                 "?path=" + url + "&method=" + link.method;
         }
@@ -81,7 +74,7 @@ define(['base/request', 'mithril'], function (req, m) {
     };
 
     model.getHref = function(rel, method, contentType, id) {
-        var link = model.getLink(rel, method, contentType);
+        const link = model.getLink(rel, method, contentType);
         return model.getLinkHref(link, id);
     };
 

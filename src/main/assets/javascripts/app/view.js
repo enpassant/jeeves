@@ -2,27 +2,28 @@ define(['./model', './controller', 'menu', 'mithril'],
     function (model, controller, menu, m)
 {
     model.view = function(ctrl) {
-        var component = ctrl.component;
+        const component = ctrl.component;
 
-        var componentUi = (component) ?
+        const componentUi = (component) ?
             m("div.ui.basic.segment", [
                 m(component)
             ]) : "";
 
-        var outdatedBrowserUI = m("The browser is outdated");
+        const outdatedBrowserUI = m("The browser is outdated");
 
-        var messageUI = m("div.ui.basic.segment",
-            model.messages().map(function(msg, idx) {
+        const messageUI = m("div.ui.basic.segment",
+            model.messages().map(function(message, idx) {
+                const msg = message.toObject();
                 return m("div.ui." + msg.type + "message",
                     { config: function(elem) {
                         $(elem).off('click');
                         $(elem).on('click', function() {
-                            var messages = model.messages().filter(
+                            const messages = model.messages().filter(
                                 function(msg, i) {
                                     return (idx !== i);
-                                });
+                                }).toList();
                             model.messages(messages);
-                            $(elem).transition("fade");
+                            m.redraw();
                         });
                     }}, [
                     m("i.close.icon"),
@@ -30,10 +31,10 @@ define(['./model', './controller', 'menu', 'mithril'],
                         msg.action ? msg.header + ": " +  msg.action : msg.header),
                     msg.content
                 ]);
-           })
+           }).toArray()
         );
 
-        var appUI = m("div", [
+        const appUI = m("div", [
             m.component(menu),
             m("div.ui.stackable.grid", [
                 m("div.twelve.wide.column", [
@@ -43,7 +44,7 @@ define(['./model', './controller', 'menu', 'mithril'],
             ])
         ]);
 
-        var isStorage = typeof(Storage) !== "undefined";
+        const isStorage = typeof(Storage) !== "undefined";
 
         return isStorage ? appUI : outdatedBrowserUI;
     };

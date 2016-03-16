@@ -12,7 +12,8 @@
         paths: {
             'mithril': '../lib/mithril/mithril',
             'semantic': '../lib/Semantic-UI/semantic.min',
-            'jquery': '../lib/jquery/jquery.min'
+            'jquery': '../lib/jquery/jquery.min',
+            'immutable': '../lib/immutable/immutable.min'
         },
         shim: {
             'semantic': {
@@ -42,7 +43,7 @@
         console.log(err);
     };
 
-    require(['app', 'mithril'], function (app, m) {
+    require(['app', 'mithril', 'immutable'], function (app, m) {
         m.route(document.body, "/", {
             "/": app,
             "/:componentName": app
