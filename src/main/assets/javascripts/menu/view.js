@@ -53,10 +53,12 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
     };
 
     model.view = function() {
-        var menuItems = app.links().filter(function(link) {
-            var component = app.components[app.getComponent(link.type)];
+        var menuItems = app.links().filter(function(l) {
+            const link = l.toJS();
+            const component = app.components[app.getComponent(link.type)];
             return link.title && link.method === 'GET' && component;
-        }).map(function(link) {
+        }).map(function(l) {
+            const link = l.toJS();
             return m("a.item", {
                 href: app.getLinkHref(link),
                 config: m.route},

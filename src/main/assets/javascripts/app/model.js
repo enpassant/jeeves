@@ -42,17 +42,18 @@ define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
                 const link = Immutable.Map(arr[i])
                     .set("fullUrl", model.fullUri(arr[i].url))
                     .set("method", methods[j]);
-                links.push(link.toJS());
+                links.push(link);
             }
         }
         model.links(Immutable.List(links));
     };
 
     model.getLink = function(rel, method, contentType) {
-        return model.links().find(function(link) {
-            return (link.rel === rel && link.method === method &&
-                (typeof contentType === 'undefined' || link.type === contentType));
+        const linkObj = model.links().find(function(link) {
+            return (link.get("rel") === rel && link.get("method") === method &&
+                (typeof contentType === 'undefined' || link.get("type") === contentType));
         });
+        return linkObj ? linkObj.toJS() : undefined;
     };
 
     model.redirect = function(rel, method) {
