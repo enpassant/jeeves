@@ -36,15 +36,15 @@ define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
 
     model.setLinks = function(arr) {
         const links = [];
-        for (var i = 0, len = arr.length; i < len; i++) {
-            const methods = arr[i].method.split(" ");
-            for (var j = 0, len2 = methods.length; j < len2; j++) {
-                const link = Immutable.Map(arr[i])
-                    .set("fullUrl", model.fullUri(arr[i].url))
-                    .set("method", methods[j]);
+        arr.forEach(function(l, i) {
+            const methods = l.method.split(" ");
+            methods.forEach(function(method, j) {
+                const link = Immutable.Map(l)
+                    .set("fullUrl", model.fullUri(l.url))
+                    .set("method", method);
                 links.push(link);
-            }
-        }
+            });
+        });
         model.links(Immutable.List(links));
     };
 
