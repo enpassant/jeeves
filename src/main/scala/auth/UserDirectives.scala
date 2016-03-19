@@ -21,16 +21,16 @@ object UserDirectives extends CommonDirectives with BlogFormats with UserFormats
 
     respondWithLinks(links:_*) {
       headComplete ~
-      getList[User](modelUser, User)()
+      getList[User](modelUser, User)()()
     }
   } ~
   pathPrefix(Segment)(handleUser)
 
   def handleUser(userId: String) = pathEnd {
     headComplete ~
-    getEntity[User](modelUser, userId) ~
-    putEntity[User](modelUser, _.copy(id = userId), userId) ~
-    deleteEntity[User](modelUser, userId)
+    getEntity[User](modelUser, userId)() ~
+    putEntity[User](modelUser, _.copy(id = userId), userId)() ~
+    deleteEntity[User](modelUser, userId)()
   }
 
   def userListLink(rel: String, methods: List[HttpMethod] = List(GET)) =

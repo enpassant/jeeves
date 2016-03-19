@@ -33,7 +33,7 @@ object BlogDirectives extends CommentDirectives
 
     respondWithLinks(links:_*) {
       headComplete ~
-      getList[Blog](modelBlog, Blog)()
+      getList[Blog](modelBlog, Blog)()()
     }
   } ~
   handleNewBlogs(optUser) ~
@@ -82,10 +82,10 @@ object BlogDirectives extends CommentDirectives
             //getEntity[Blog](modelBlog, blogId)
           } ~
           Right.checkRight(optUser, putRight) {
-            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
+            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)()
           } ~
           Right.checkRight(optUser, deleteRight) {
-            deleteEntity[Blog](modelBlog, blogId)
+            deleteEntity[Blog](modelBlog, blogId)()
           }
         }
       }
@@ -93,7 +93,7 @@ object BlogDirectives extends CommentDirectives
         Right.checkRight(optUser, RoleAddNew) {
           respondBlogLinks(blogId, PUT) {
             headComplete ~
-            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)
+            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)()
           }
         }
     }

@@ -5,8 +5,8 @@ import core._
 import akka.actor.ActorSelection
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.model.headers.Accept
-import akka.http.scaladsl.server.{Directive1, Route, RouteResult}
+import akka.http.scaladsl.model.headers.{Accept, HttpChallenge}
+import akka.http.scaladsl.server.{AuthenticationFailedRejection, Directive1, Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
 import java.util.UUID
@@ -33,11 +33,13 @@ object TokenDirectives extends CommentDirectives
 
   def handleTokens = pathEnd {
     headComplete ~
-    postEntity[Login, Token](modelToken)
+    postEntity[Login, Token](modelToken)(new AuthenticationFailedRejection(
+      AuthenticationFailedRejection.CredentialsRejected,
+        HttpChallenge("Token", "Jeeves")))
   } ~
   path(Segment) { tokenId =>
-    getEntity[Token](modelToken, tokenId) ~
-    deleteEntity[Token](modelToken, tokenId)
+    getEntity[Token](modelToken, tokenId)() ~
+    deleteEntity[Token](modelToken, tokenId)()
   }
 
   def tokenLinks = respondWithLinks(

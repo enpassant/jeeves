@@ -6,9 +6,10 @@ import akka.actor.ActorSelection
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Accept, HttpChallenge, Link, LinkParams, LinkValue, RawHeader}
+import akka.http.scaladsl.model.headers.{Accept, HttpChallenge, Link,
+  LinkParams, LinkValue, RawHeader}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.AuthenticationFailedRejection
+import akka.http.scaladsl.server.{AuthenticationFailedRejection, Rejection}
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -61,57 +62,61 @@ trait CommonDirectives extends BaseFormats {
   }
 
   def getList[T: ClassTag](model: ActorSelection, t: Any)(params: Any*)
+    (rejections: Rejection*)
     (implicit m: ToEntityMarshaller[Seq[T]]) = get
   {
     parameters('offset ? 0, 'limit ? 5) { (offset: Int, limit: Int) =>
       { ctx =>
         (model ? ListWithOffset(t, params, offset, limit)) flatMap {
           case EntityList(slice: Iterable[T @unchecked]) => ctx.complete(slice.toSeq)
-          case _ => ctx.reject()
+          case _ => ctx.reject(rejections:_*)
         }
       }
     }
   }
 
   def getEntity[T: ClassTag](model: ActorSelection, ids: String*)
+    (rejections: Rejection*)
     (implicit m: ToEntityMarshaller[T]) = get
   {
     { ctx =>
       (model ? GetEntity(ids:_*)) flatMap {
         case Some(entity: T) => ctx.complete(entity)
-        case None => ctx.reject()
+        case _ => ctx.reject(rejections:_*)
       }
     }
   }
 
   def putEntity[T : ClassTag](model: ActorSelection, modify: T => T, ids: String*)
+    (rejections: Rejection*)
     (implicit u: FromRequestUnmarshaller[T], m: ToEntityMarshaller[T]) = put {
       entity(as[T]) { entity => ctx =>
         (model ? AddEntity(modify(entity), ids:_*)) flatMap {
           case entity: T => ctx.complete(entity)
+          case _ => ctx.reject(rejections:_*)
         }
       }
     }
 
   def postEntity[T: ClassTag, U: ClassTag](model: ActorSelection, ids: String*)
+    (rejections: Rejection*)
     (implicit u: FromRequestUnmarshaller[T], m: ToEntityMarshaller[U]) = post {
       entity(as[T]) { entity => ctx =>
         (model ? AddEntity(entity, ids:_*)) flatMap {
           case entity: U => ctx.complete(entity)
-          case _ => ctx.reject(new AuthenticationFailedRejection(
-            AuthenticationFailedRejection.CredentialsRejected,
-              HttpChallenge("Token", "Jeeves")))
+          case _ => ctx.reject(rejections:_*)
         }
       }
     }
 
   def deleteEntity[T: ClassTag](model: ActorSelection, ids: String*)
+    (rejections: Rejection*)
     (implicit m: ToEntityMarshaller[T]) = delete
   {
     { ctx =>
       (model ? DeleteEntity(ids:_*)) flatMap {
         case Some(entity: T) => ctx.complete(entity)
-        case None => ctx.reject()
+        case _ => ctx.reject(rejections:_*)
       }
     }
   }

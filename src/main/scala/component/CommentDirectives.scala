@@ -22,16 +22,16 @@ trait CommentDirectives extends CommonDirectives with BlogFormats with CommentFo
 
     respondWithLinks(links:_*) {
       headComplete ~
-      getList[Comment](modelComment, Comment)(blogId)
+      getList[Comment](modelComment, Comment)(blogId)()
     }
   }
 
   def handleComment(blogId: String)(commentId: String) = pathEnd {
     (commentLinks(blogId)) {
       headComplete ~
-      getEntity[Comment](modelComment, blogId, commentId) ~
-      putEntity[Comment](modelComment, _.copy(id = commentId, blogId = blogId), blogId) ~
-      deleteEntity[Comment](modelComment, blogId, commentId)
+      getEntity[Comment](modelComment, blogId, commentId)() ~
+      putEntity[Comment](modelComment, _.copy(id = commentId, blogId = blogId), blogId)() ~
+      deleteEntity[Comment](modelComment, blogId, commentId)()
     }
   }
 
