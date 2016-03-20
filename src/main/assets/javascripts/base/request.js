@@ -1,20 +1,24 @@
 define(['mithril'], function (m) {
     'use strict';
 
-    var req = {};
+    const req = {};
 
-    var parseLink = function(link) {
-        var linkObj = {};
-        var re = /<([^>]+)>(.*)/g;
-        var result = re.exec(link.trim());
+    const dequote = function(str) {
+        if (str[0] === '"') return str.substring(1, str.length-1);
+        return str;
+    };
+
+    const parseLink = function(link) {
+        const linkObj = {};
+        const re = /<([^>]+)>(.*)/g;
+        const result = re.exec(link.trim());
         if (result && result.length >= 3) {
             linkObj.url = result[1];
-            var linkArr = result[2].split(";");
-            var linkObjArr = linkArr.map(function(linkItem) {
-                var linkItemArr = linkItem.trim().split("=");
+            const linkArr = result[2].split(";");
+            const linkObjArr = linkArr.map(function(linkItem) {
+                const linkItemArr = linkItem.trim().split("=");
                 if (linkItemArr.length >= 2) {
-                    var value = linkItemArr[1];
-                    if (value[0] === '"') value = value.substring(1, value.length-1);
+                    const value = dequote(linkItemArr[1]);
                     linkObj[linkItemArr[0]] = value;
                 }
             });
@@ -22,25 +26,25 @@ define(['mithril'], function (m) {
         return linkObj;
     };
 
-    var baseExtract = function(xhr, xhrOptions) {
+    const baseExtract = function(xhr, xhrOptions) {
         if (xhr.status >= 400) {
             throw xhr;
         }
         return xhr.response;
     };
 
-    var extract = function(linkVar) {
+    const extract = function(linkVar) {
         return function(xhr, xhrOptions) {
             if (xhr.status >= 400) {
                 throw xhr;
             }
             try {
-                var links = xhr.getResponseHeader("Link");
+                const links = xhr.getResponseHeader("Link");
                 if (links) {
-                    var linkObjs = links.split(",").map(parseLink);
+                    const linkObjs = links.split(",").map(parseLink);
                     linkVar(linkObjs);
                 }
-                var resp = xhr.responseText;
+                const resp = xhr.responseText;
                 if (resp) return resp;
             } catch(e) {
                 console.log(e);
@@ -50,7 +54,7 @@ define(['mithril'], function (m) {
     };
 
     req.head = function(url, linkVar) {
-        var link = { method: 'HEAD', fullUrl: url };
+        const link = { method: 'HEAD', fullUrl: url };
         return req.sendLink(link, {}, linkVar);
     };
 
