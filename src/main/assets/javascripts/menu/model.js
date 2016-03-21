@@ -1,5 +1,5 @@
 define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
-    var model = {};
+    const model = {};
 
     model.userContentType = 'application/vnd.enpassant.user+json';
     model.tokenContentType = 'application/vnd.enpassant.token+json';
@@ -10,9 +10,9 @@ define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
     };
 
     model.initToken = function(value) {
-        var tokenId = sessionStorage.tokenId;
+        const tokenId = sessionStorage.tokenId;
         if (tokenId && !model.vm.loggedInUser()) {
-            var tokenPromise = model.loadToken(tokenId);
+            const tokenPromise = model.loadToken(tokenId);
         }
         return value;
     };
@@ -35,7 +35,7 @@ define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
     };
 
     model.loadUser = function(userId) {
-        var link = app.getLink("user", "GET", model.userContentType);
+        const link = app.getLink("user", "GET", model.userContentType);
         if (link) {
             link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, userId));
             req.sendLink(link, {}, undefined).then(
@@ -48,7 +48,7 @@ define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
     };
 
     model.loadToken = function(tokenId) {
-        var link = app.getLink("token", "GET", model.tokenContentType);
+        const link = app.getLink("token", "GET", model.tokenContentType);
         if (link) {
             link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, tokenId));
             return req.sendLink(link,{}, undefined).then(

@@ -2,10 +2,10 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
      'base/request', 'mithril'],
      function (model, app, loc, msg, req, m)
 {
-    var login = function(name, password) {
+    const login = function(name, password) {
         return function(elem) {
-            var link = app.getLink("login", "POST", model.tokenContentType);
-            var login = { name: name, password: password };
+            const link = app.getLink("login", "POST", model.tokenContentType);
+            const login = { name: name, password: password };
             req.sendData(link, login, 'application/json').then(
                 function(token) {
                     sessionStorage.tokenId = token.id;
@@ -15,9 +15,9 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
         };
     };
 
-    var logout = function(event) {
+    const logout = function(event) {
         $(event.target).popup('destroy');
-        var link = app.getLink("token", "DELETE", model.tokenContentType);
+        const link = app.getLink("token", "DELETE", model.tokenContentType);
         link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, sessionStorage.tokenId));
         req.sendLink(link, {}, undefined).then(
             function(token) {
@@ -53,7 +53,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
     };
 
     model.view = function() {
-        var menuItems = app.links().filter(function(l) {
+        const menuItems = app.links().filter(function(l) {
             const link = l.toJS();
             const component = app.components[app.getComponent(link.type)];
             return link.title && link.method === 'GET' && component;
@@ -64,7 +64,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
                 config: m.route},
                 loc.tr(msg, link.title || ("get " + link.rel)));
         }).toArray();
-        var rightMenu = m.component(model.vm.loginComponent());
+        const rightMenu = m.component(model.vm.loginComponent());
         return m("div.ui.container.grid", [
             m("div.mobile.only.sixteen.wide.column",
                 m("div.ui.inverted.top.fixed.menu",
