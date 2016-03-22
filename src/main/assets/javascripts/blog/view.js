@@ -1,26 +1,26 @@
 define(['./model', 'base/localization', 'i18n!nls/messages', 'mithril'],
     function (model, loc, msg, m) {
     model.view = function(vm, args) {
-        var date = loc.format(vm.blog().date, 'date');
-        var editable = vm.isEditable() ? "[contenteditable=true]" : "";
-        var editIcon = (vm.putHref && !vm.isEditable()) ?
+        const date = loc.format(vm.blog().date, 'date');
+        const editable = vm.isEditable() ? "[contenteditable=true]" : "";
+        const editIcon = (vm.putHref && !vm.isEditable()) ?
             m("a.clickable", {onclick: function() {
                 model.loadForEdit(vm).then(function() {
                     vm.isEditable(true);
                 });
             }}, m("i.write.icon"))
             : "";
-        var deleteButton = vm.deleteHref ?
+        const deleteButton = vm.deleteHref ?
             m("button.ui.button.right.floated", {onclick: model.delete.bind(null, vm)},
                    loc.tr(msg, "Delete"))
             : "";
 
-        var appendHtml = function(html) {
+        const appendHtml = function(html) {
             return function(el, init) {
                 if (!init) el.innerHTML = html;
             };
         };
-        var noteUI = editable ?
+        const noteUI = editable ?
             m("textarea#blog-note[rows=6]", vm.blog().note) :
             m("div.content", {config: appendHtml(vm.blog().note)});
 

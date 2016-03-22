@@ -1,16 +1,16 @@
 define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, req, m) {
-    var model = {};
+    const model = {};
 
     model.contentType = 'application/vnd.enpassant.blog+json';
 
     app.components['vnd.enpassant.blog'] = model;
 
     model.loadForEdit = function(vm) {
-        var link = app.getLink("edit", "GET", model.contentType);
+        const link = app.getLink("edit", "GET", model.contentType);
         if (link) {
             return req.sendLink(link, {}, app.setLinks).then(vm.blog);
         } else {
-            var promise = new Promise(function (resolve, reject) {
+            const promise = new Promise(function (resolve, reject) {
                 m.startComputation();
                 resolve();
                 vm.isEditable(true);
@@ -24,8 +24,8 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
         if (!vm.isEditable()) {
             app.redirect("blogs", "GET");
         } else {
-            var link = app.getLink("self", "PUT", model.contentType);
-            var blog = vm.blog();
+            const link = app.getLink("self", "PUT", model.contentType);
+            const blog = vm.blog();
             blog.title = $('#blog-title').text();
             blog.note = $('#blog-note').val();
             req.sendData(link, vm.blog, model.contentType, app.setLinks).then(
@@ -36,8 +36,8 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     };
 
     model.delete = function(vm) {
-        var link = app.getLink("self", "DELETE", model.contentType);
-        var url = app.fullUri(link.url);
+        const link = app.getLink("self", "DELETE", model.contentType);
+        const url = app.fullUri(link.url);
         req.sendLink(link, {}, app.setLinks).then(function() {
             app.redirect("blogs", "GET");
         });
@@ -60,7 +60,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     };
 
     model.load = function(vm) {
-        var params = m.route.param();
+        const params = m.route.param();
 
         vm.url = app.fullUri(params.path);
 
@@ -68,7 +68,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
             return req.head(vm.url, app.setLinks).then(
                 menu.initToken, app.errorHandler(menu));
         } else {
-            var link = {method: "GET", fullUrl: vm.url, type: model.contentType};
+            const link = {method: "GET", fullUrl: vm.url, type: model.contentType};
             return req.sendLink(link, {}, app.setLinks).then(vm.blog).then(
                     menu.initToken, app.errorHandler(menu));
         }

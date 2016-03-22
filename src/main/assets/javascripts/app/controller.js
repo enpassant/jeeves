@@ -2,7 +2,7 @@ define(['./model', 'menu', 'collection', 'blog', 'mithril'],
     function (model, menu, collection, blog, m)
 {
     model.controller = function(data) {
-        var params = m.route.param();
+        const params = m.route.param();
 
         if (params.path) {
             if (params.componentName && model.components[params.componentName]) {

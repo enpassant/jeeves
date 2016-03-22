@@ -3,13 +3,13 @@ define(['./model', 'app/model', 'base/localization', 'jquery',
      function (model, app, loc, $, m, msg)
 {
     model.view = function(vm) {
-        var link = app.getLink("self", "GET", model.contentType);
-        var columns = model.getColumns(link);
-        var columnsUI = columns.map(function(column, i) {
+        const link = app.getLink("self", "GET", model.contentType);
+        const columns = model.getColumns(link);
+        const columnsUI = columns.map(function(column, i) {
             return m("th", loc.tr(msg, column.name));
         });
-        var operations = [ m("i.configure.icon") ];
-        var href = app.getHref("new", "GET");
+        const operations = [ m("i.configure.icon") ];
+        const href = app.getHref("new", "GET");
         if (href) {
             operations.push(m("a", {href: href, config: m.route}, m("i.add.circle.icon")));
         }
@@ -31,26 +31,26 @@ define(['./model', 'app/model', 'base/localization', 'jquery',
                 ]),
                 m("tbody", [
                     vm.rows().map(function(row, index) {
-                        var id = row[Object.keys(row)[0]];
-                        var columnValueUI = columns.map(function(column, i) {
+                        const id = row[Object.keys(row)[0]];
+                        const columnValueUI = columns.map(function(column, i) {
                             return m("td", row[column.name] ?
                                    loc.format(row[column.name], column.type) : "");
                         });
-                        var operations = [];
-                        href = app.getHref("item", "GET", undefined, id);
-                        if (href) {
-                            operations.push(m("a", {href: href, config: m.route},
+                        const operations = [];
+                        const hrefGet = app.getHref("item", "GET", undefined, id);
+                        if (hrefGet) {
+                            operations.push(m("a", {href: hrefGet, config: m.route},
                                 m("i.unhide.icon")));
                         }
-                        href = app.getHref("item", "PUT", undefined, id);
-                        if (href) {
-                            operations.push(m("a", {href: href, config: m.route},
+                        const hrefPut = app.getHref("item", "PUT", undefined, id);
+                        if (hrefPut) {
+                            operations.push(m("a", {href: hrefPut, config: m.route},
                                 m("i.write.icon")));
                         }
-                        link = app.getLink("item", "DELETE");
-                        if (link) {
+                        const linkDelete = app.getLink("item", "DELETE");
+                        if (linkDelete) {
                             operations.push(m("a.clickable",
-                                {onclick: vm.deleteItem.bind(vm, link, id)},
+                                {onclick: vm.deleteItem.bind(vm, linkDelete, id)},
                                 m("i.trash.outline.icon")));
                         }
                         columnValueUI.push(m("td", operations));

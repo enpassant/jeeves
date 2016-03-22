@@ -1,8 +1,8 @@
 (function(requirejs) {
     "use strict";
 
-    var isStorage = typeof(Storage) !== "undefined";
-    var lang = isStorage ? localStorage.lang : undefined;
+    const isStorage = typeof(Storage) !== "undefined";
+    const lang = isStorage ? localStorage.lang : undefined;
 
     requirejs.config({
         optimize: "uglify2",
