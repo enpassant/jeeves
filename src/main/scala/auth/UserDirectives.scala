@@ -8,10 +8,16 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.{Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
+import akka.pattern.ask
+import akka.util.Timeout
 import java.util.UUID
 import org.joda.time.DateTime
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 object UserDirectives extends CommonDirectives with BlogFormats with UserFormats {
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   val modelUser = Supervisor.getChild(ModelUser.name)
 
   def handleUsers(optUser: Option[User]) = pathEnd {
@@ -31,6 +37,18 @@ object UserDirectives extends CommonDirectives with BlogFormats with UserFormats
     getEntity[User](modelUser, userId)() ~
     putEntity[User](modelUser, _.copy(id = userId), userId)() ~
     deleteEntity[User](modelUser, userId)()
+  }
+
+  def optionalUser(token: Option[Token])(route: Option[User] => Route): Route = {
+    val user = token match {
+      case Some(t) =>
+        (modelUser ? GetEntity[User](t.userId)) map {
+          case Some(user: User) => Some(user)
+          case _ => None
+        }
+      case _ => Future(None)
+    }
+    ctx => user flatMap ( u => route(u)(ctx) )
   }
 
   def userListLink(rel: String, methods: List[HttpMethod] = List(GET)) =
