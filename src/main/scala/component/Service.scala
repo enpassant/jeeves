@@ -10,12 +10,7 @@ import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.{Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import akka.pattern.ask
-import akka.pattern.ask
-import akka.util.Timeout
 import java.util.UUID
-import scala.concurrent.Future
-import scala.concurrent.duration._
 import org.joda.time.DateTime
 
 class Service(val config: Config, val routerDefined: Boolean)
@@ -23,7 +18,6 @@ class Service(val config: Config, val routerDefined: Boolean)
   with CommonDirectives
   with ActorLogging
 {
-  import context.dispatcher
   implicit val system = context.system
   implicit val materializer = ActorMaterializer()
 
