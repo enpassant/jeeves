@@ -21,7 +21,7 @@ class TickActor(val config: Config) extends Actor with ActorLogging  with Servic
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val serviceUri = s"http://${config.router.get}/services"
-  val microService = MicroService(UUID.randomUUID.toString, "api",
+  val microService = MicroService(UUID.randomUUID.toString, "",
     config.host, config.port, config.mode)
   val entity = Marshal(microService).to[RequestEntity]
 
