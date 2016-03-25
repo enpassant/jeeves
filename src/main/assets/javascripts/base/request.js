@@ -4,8 +4,7 @@ define(['mithril'], function (m) {
     const req = {};
 
     const dequote = function(str) {
-        if (str[0] === '"') return str.substring(1, str.length-1);
-        return str;
+        return str.replace(/"/g, '');
     };
 
     const parseLink = function(link) {
