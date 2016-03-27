@@ -8,6 +8,7 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.{Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
+import akka.pattern.ask
 import java.util.UUID
 import org.joda.time.DateTime
 
@@ -22,16 +23,16 @@ trait CommentDirectives extends CommonDirectives with BlogFormats with CommentFo
 
     respondWithLinks(links:_*) {
       headComplete ~
-      getList[Comment](modelComment, Comment)(blogId)()
+      getList[Comment](modelComment ? _, Comment)(blogId)()
     }
   }
 
   def handleComment(blogId: String)(commentId: String) = pathEnd {
     (commentLinks(blogId)) {
       headComplete ~
-      getEntity[Comment](modelComment, blogId, commentId)() ~
-      putEntity[Comment](modelComment, _.copy(id = commentId, blogId = blogId), blogId)() ~
-      deleteEntity[Comment](modelComment, blogId, commentId)()
+      getEntity[Comment](modelComment ? _, blogId, commentId)() ~
+      putEntity[Comment](modelComment ? _, _.copy(id = commentId, blogId = blogId), blogId)() ~
+      deleteEntity[Comment](modelComment ? _, blogId, commentId)()
     }
   }
 

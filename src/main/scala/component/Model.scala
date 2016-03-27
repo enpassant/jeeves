@@ -1,10 +1,17 @@
 package component
 
 import core._
+import scala.concurrent.Future
 
-case class GetEntity[T](ids: String*)
+trait ModelStatement
+
+case class GetEntity[T](ids: String*) extends ModelStatement
 case class ListWithOffset(t: Any, params: Seq[Any], offset: Int, limit: Int)
-case class EntityList[T](slice: Iterable[T])
-case class AddEntity[T](blog: T, ids: String*)
-case class DeleteEntity(ids: String*)
-// vim: set ts=4 sw=4 et:
+  extends ModelStatement
+case class EntityList[T](slice: Iterable[T]) extends ModelStatement
+case class AddEntity[T](blog: T, ids: String*) extends ModelStatement
+case class DeleteEntity(ids: String*) extends ModelStatement
+
+object Model {
+  type Function = ModelStatement => Future[Any]
+}

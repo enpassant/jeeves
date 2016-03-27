@@ -20,23 +20,28 @@ object UserDirectives extends CommonDirectives with BlogFormats with UserFormats
 
   val modelUser = Supervisor.getChild(ModelUser.name)
 
-  def handleUsers(optUser: Option[User]) = pathEnd {
+  val userService = (prefix: String, modelFunction: Model.Function) =>
+    (optUser: Option[User]) => pathPrefix(prefix) {
+      handleUsers(modelFunction)(optUser)
+    }
+
+  def handleUsers(modelFunction: Model.Function)(optUser: Option[User]) = pathEnd {
     val links = Right.mapActions(optUser, Map(
       userListLink("self") -> Authenticated
     ))
 
     respondWithLinks(links:_*) {
       headComplete ~
-      getList[User](modelUser, User)()()
+      getList[User](modelFunction, User)()()
     }
   } ~
-  pathPrefix(Segment)(handleUser)
+  pathPrefix(Segment)(handleUser(modelFunction: Model.Function))
 
-  def handleUser(userId: String) = pathEnd {
+  def handleUser(modelFunction: Model.Function)(userId: String) = pathEnd {
     headComplete ~
-    getEntity[User](modelUser, userId)() ~
-    putEntity[User](modelUser, _.copy(id = userId), userId)() ~
-    deleteEntity[User](modelUser, userId)()
+    getEntity[User](modelFunction, userId)() ~
+    putEntity[User](modelFunction, _.copy(id = userId), userId)() ~
+    deleteEntity[User](modelFunction, userId)()
   }
 
   def optionalUser(token: Option[Token])(route: Option[User] => Route): Route = {

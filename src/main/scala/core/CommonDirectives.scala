@@ -61,13 +61,13 @@ trait CommonDirectives extends BaseFormats {
         mediaRanges.find(mt => mt.matches(mediaType)).flatMap( _.params get "version")
   }
 
-  def getList[T: ClassTag](model: ActorSelection, t: Any)(params: Any*)
+  def getList[T: ClassTag](modelFunction: Model.Function, t: Any)(params: Any*)
     (rejections: Rejection*)
     (implicit m: ToEntityMarshaller[Seq[T]]) = get
   {
     parameters('offset ? 0, 'limit ? 5) { (offset: Int, limit: Int) =>
       { ctx =>
-        (model ? ListWithOffset(t, params, offset, limit)) flatMap {
+        (modelFunction(ListWithOffset(t, params, offset, limit))) flatMap {
           case EntityList(slice: Iterable[T @unchecked]) => ctx.complete(slice.toSeq)
           case _ => ctx.reject(rejections:_*)
         }
@@ -75,46 +75,46 @@ trait CommonDirectives extends BaseFormats {
     }
   }
 
-  def getEntity[T: ClassTag](model: ActorSelection, ids: String*)
+  def getEntity[T: ClassTag](modelFunction: Model.Function, ids: String*)
     (rejections: Rejection*)
     (implicit m: ToEntityMarshaller[T]) = get
   {
     { ctx =>
-      (model ? GetEntity(ids:_*)) flatMap {
+      (modelFunction(GetEntity(ids:_*))) flatMap {
         case Some(entity: T) => ctx.complete(entity)
         case _ => ctx.reject(rejections:_*)
       }
     }
   }
 
-  def putEntity[T : ClassTag](model: ActorSelection, modify: T => T, ids: String*)
+  def putEntity[T : ClassTag](modelFunction: Model.Function, modify: T => T, ids: String*)
     (rejections: Rejection*)
     (implicit u: FromRequestUnmarshaller[T], m: ToEntityMarshaller[T]) = put {
       entity(as[T]) { entity => ctx =>
-        (model ? AddEntity(modify(entity), ids:_*)) flatMap {
+        (modelFunction(AddEntity(modify(entity), ids:_*))) flatMap {
           case entity: T => ctx.complete(entity)
           case _ => ctx.reject(rejections:_*)
         }
       }
     }
 
-  def postEntity[T: ClassTag, U: ClassTag](model: ActorSelection, ids: String*)
+  def postEntity[T: ClassTag, U: ClassTag](modelFunction: Model.Function, ids: String*)
     (rejections: Rejection*)
     (implicit u: FromRequestUnmarshaller[T], m: ToEntityMarshaller[U]) = post {
       entity(as[T]) { entity => ctx =>
-        (model ? AddEntity(entity, ids:_*)) flatMap {
+        (modelFunction(AddEntity(entity, ids:_*))) flatMap {
           case entity: U => ctx.complete(entity)
           case _ => ctx.reject(rejections:_*)
         }
       }
     }
 
-  def deleteEntity[T: ClassTag](model: ActorSelection, ids: String*)
+  def deleteEntity[T: ClassTag](modelFunction: Model.Function, ids: String*)
     (rejections: Rejection*)
     (implicit m: ToEntityMarshaller[T]) = delete
   {
     { ctx =>
-      (model ? DeleteEntity(ids:_*)) flatMap {
+      (modelFunction(DeleteEntity(ids:_*))) flatMap {
         case Some(entity: T) => ctx.complete(entity)
         case _ => ctx.reject(rejections:_*)
       }

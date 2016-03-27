@@ -7,13 +7,16 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.headers.Accept
-import akka.http.scaladsl.server.{Route, RouteResult}
+import akka.http.scaladsl.server.{Directive0, Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
+import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import java.util.UUID
 import org.joda.time.DateTime
 
-class Service(val config: Config, val routerDefined: Boolean)
+class Service(val config: Config, val routerDefined: Boolean,
+  services: List[Option[User] => Route],
+  serviceLinks: List[Option[User] => Directive0])
   extends Actor
   with CommonDirectives
   with ActorLogging
@@ -21,7 +24,6 @@ class Service(val config: Config, val routerDefined: Boolean)
   implicit val system = context.system
   implicit val materializer = ActorMaterializer()
 
-  import BlogDirectives._
   import TokenDirectives._
   import UserDirectives._
 
@@ -39,18 +41,13 @@ class Service(val config: Config, val routerDefined: Boolean)
         pathPrefix("api") {
           optionalToken { optToken =>
             optionalUser(optToken) { optUser =>
-              (blogLinks(optUser) & tokenLinks & userMenuLinks(optUser) & userItemLinks) {
+              (serviceLinks.map(_(optUser)).reduce(_ & _) & tokenLinks & userItemLinks) {
                 headComplete
               } ~
               (tokenLinks & userItemLinks) {
-                pathPrefix("blogs") {
-                  handleBlogs(optUser)
-                } ~
+                services.map(_(optUser)).reduce(_ ~ _) ~
                 pathPrefix("tokens") {
                   handleTokens
-                } ~
-                pathPrefix("users") {
-                  handleUsers(optUser)
                 }
               }
             }
@@ -90,7 +87,8 @@ class Service(val config: Config, val routerDefined: Boolean)
 }
 
 object Service {
-  def props(config: Config, routerDefined: Boolean) =
-    Props(new Service(config, routerDefined))
+  def props(config: Config, routerDefined: Boolean,
+    services: List[Option[User] => Route], serviceLinks: List[Option[User] => Directive0]) =
+    Props(new Service(config, routerDefined, services, serviceLinks))
   def name = "service"
 }

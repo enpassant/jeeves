@@ -9,7 +9,6 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.{Directive1, Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
-import akka.pattern.ask
 import com.github.rjeschke.txtmark.Processor
 import java.util.UUID
 import org.joda.time.DateTime
@@ -20,9 +19,12 @@ object BlogDirectives extends CommentDirectives
 {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  val modelBlog = Supervisor.actorSystem.actorSelection("/user/supervisor/" + ModelBlog.name)
+  val blogService = (prefix: String, modelFunction: Model.Function) =>
+    (optUser: Option[User]) => pathPrefix(prefix) {
+      handleBlogs(modelFunction)(optUser)
+    }
 
-  def handleBlogs(optUser: Option[User]) = pathEnd {
+  def handleBlogs(modelFunction: Model.Function)(optUser: Option[User]) = pathEnd {
     val itemMethods = Right.mapActions(optUser, Map(
       GET -> Authenticated, PUT -> RoleModifyAll, DELETE -> RoleDeleteAll))
 
@@ -33,11 +35,11 @@ object BlogDirectives extends CommentDirectives
 
     respondWithLinks(links:_*) {
       headComplete ~
-      getList[Blog](modelBlog, Blog)()()
+      getList[Blog](modelFunction, Blog)()()
     }
   } ~
   handleNewBlogs(optUser) ~
-  pathPrefix(Segment)(handleBlog(optUser))
+  pathPrefix(Segment)(handleBlog(modelFunction)(optUser))
 
   def handleNewBlogs(optUser: Option[User]) = path("new") {
     get {
@@ -51,8 +53,10 @@ object BlogDirectives extends CommentDirectives
     }
   }
 
-  def handleBlog(optUser: Option[User])(blogId: String) = pathEnd {
-    getBlogDirective(blogId) {
+  def handleBlog(modelFunction: Model.Function)(optUser: Option[User])(blogId: String) =
+    pathEnd
+  {
+    getBlogDirective(modelFunction)(blogId) {
       case Some(blog: Blog) => {
         val isOwnBlog = CustomRight(
           () => optUser.flatMap(_.login).getOrElse("") == blog.accountId)
@@ -68,7 +72,7 @@ object BlogDirectives extends CommentDirectives
           Right.checkRight(optUser, Authenticated) {
             get {
               parameters('forEdit ? false) { (forEdit: Boolean) =>
-                ctx => (modelBlog ? GetEntity(blogId)) flatMap {
+                ctx => (modelFunction(GetEntity(blogId))) flatMap {
                   case Some(entity: Blog) => if (forEdit) {
                     ctx.complete(entity)
                   } else {
@@ -82,10 +86,10 @@ object BlogDirectives extends CommentDirectives
             //getEntity[Blog](modelBlog, blogId)
           } ~
           Right.checkRight(optUser, putRight) {
-            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)()
+            putEntity[Blog](modelFunction, _.copy(id = blogId), blogId)()
           } ~
           Right.checkRight(optUser, deleteRight) {
-            deleteEntity[Blog](modelBlog, blogId)()
+            deleteEntity[Blog](modelFunction, blogId)()
           }
         }
       }
@@ -93,7 +97,7 @@ object BlogDirectives extends CommentDirectives
         Right.checkRight(optUser, RoleAddNew) {
           respondBlogLinks(blogId, PUT) {
             headComplete ~
-            putEntity[Blog](modelBlog, _.copy(id = blogId), blogId)()
+            putEntity[Blog](modelFunction, _.copy(id = blogId), blogId)()
           }
         }
     }
@@ -111,8 +115,10 @@ object BlogDirectives extends CommentDirectives
       commentItemLink(blogId, "new", "new", List(GET))
   )
 
-  def getBlogDirective(blogId: String): Directive1[Option[Blog]] = {
-    onSuccess(modelBlog ? GetEntity(blogId)) flatMap {
+  def getBlogDirective(modelFunction: Model.Function)(blogId: String):
+    Directive1[Option[Blog]] =
+  {
+    onSuccess(modelFunction(GetEntity(blogId))) flatMap {
       case Some(blog: Blog) => provide(Some(blog))
       case None => provide(None)
     }

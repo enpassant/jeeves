@@ -33,13 +33,13 @@ object TokenDirectives extends CommentDirectives
 
   def handleTokens = pathEnd {
     headComplete ~
-    postEntity[Login, Token](modelToken)(new AuthenticationFailedRejection(
+    postEntity[Login, Token](modelToken ? _)(new AuthenticationFailedRejection(
       AuthenticationFailedRejection.CredentialsRejected,
         HttpChallenge("Token", "Jeeves")))
   } ~
   path(Segment) { tokenId =>
-    getEntity[Token](modelToken, tokenId)() ~
-    deleteEntity[Token](modelToken, tokenId)()
+    getEntity[Token](modelToken ? _, tokenId)() ~
+    deleteEntity[Token](modelToken ? _, tokenId)()
   }
 
   def tokenLinks = respondWithLinks(
