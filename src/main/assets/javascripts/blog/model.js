@@ -37,7 +37,6 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
 
     model.delete = function(vm) {
         const link = app.getLink("self", "DELETE", model.contentType);
-        const url = app.fullUri(link.url);
         req.sendLink(link, {}, app.setLinks).then(function() {
             app.redirect("blogs", "GET");
         });
