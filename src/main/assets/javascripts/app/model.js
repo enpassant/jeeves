@@ -27,7 +27,7 @@ define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
     };
 
     model.fullUri = function(uri) {
-        return model.restUri() + uri;
+        return uri;
     };
 
     model.messages = m.prop(Immutable.List([]));

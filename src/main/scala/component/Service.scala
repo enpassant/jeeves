@@ -6,13 +6,15 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
-import akka.http.scaladsl.model.headers.Accept
+import akka.http.scaladsl.model.headers.{Accept, RawHeader}
 import akka.http.scaladsl.server.{Directive0, Route, RouteResult}
 import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import java.util.UUID
 import org.joda.time.DateTime
+import scala.collection.immutable.Seq
+import scala.concurrent.ExecutionContext
 
 class Service(val config: Config, val routerDefined: Boolean,
   services: List[Option[User] => Route],
@@ -23,6 +25,8 @@ class Service(val config: Config, val routerDefined: Boolean,
 {
   implicit val system = context.system
   implicit val materializer = ActorMaterializer()
+
+  import context.dispatcher
 
   import TokenDirectives._
   import UserDirectives._
@@ -38,7 +42,7 @@ class Service(val config: Config, val routerDefined: Boolean,
         path("""([^/]+\.html).*""".r) { path =>
           getFromResource(s"public/html/$path")
         } ~
-        pathPrefix("api") {
+        prefixRoute("api") {
           optionalToken { optToken =>
             optionalUser(optToken) { optUser =>
               (serviceLinks.map(_(optUser)).reduce(_ & _) & tokenLinks & userItemLinks) {
@@ -67,6 +71,35 @@ class Service(val config: Config, val routerDefined: Boolean,
         tickActor ! Restart
         route(requestContext)
     } else route
+  }
+
+  def prefixRoute(prefix: String)(route: Route)(implicit ec: ExecutionContext): Route =
+  pathPrefix(prefix) {
+    requestContext =>
+      route(requestContext) map { result =>
+        result match {
+          case RouteResult.Complete(response) =>
+            val mappedResponse = response.mapHeaders(mapLinkHeaders("/" + prefix))
+            RouteResult.Complete(mappedResponse)
+          case _ => result
+        }
+      }
+  }
+
+  private def mapLinkHeaders(prefix: String)(headers: Seq[HttpHeader]):
+    Seq[HttpHeader] = headers.map { header =>
+      if (header.name != "Link") header
+      else addPrefixTo(prefix)(header)
+  }
+
+  private def addPrefixTo(prefix: String)(header: HttpHeader): HttpHeader = {
+    val values = header.value.split(",")
+    val regexp = "<([^>]+)>(.*)".r
+    val prefixedValues = values map { value =>
+      regexp.replaceAllIn(value, "<" + prefix + "$1>$2")
+    }
+    val prefixed = prefixedValues mkString ","
+    RawHeader("Link", prefixed)
   }
 
   def logger(route: Route): Route = {
