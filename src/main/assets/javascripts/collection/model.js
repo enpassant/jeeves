@@ -43,7 +43,7 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
     model.load = function(vm) {
         const params = m.route.param();
 
-        vm.url = app.fullUri(params.path);
+        vm.url = params.path;
         const link = {method: "GET", fullUrl: vm.url, type: model.contentType};
         return req.sendLink(link, {}, app.setLinks).then(vm.rows).then(
             menu.initToken, handleError.bind(null, vm));
@@ -51,7 +51,7 @@ define(['app/model', 'menu', 'base/request', 'mithril'], function (app, menu, re
 
     model.deleteItem = function(vm, link, id) {
         const params = m.route.param();
-        link.fullUrl = (app.fullUri(link.url)).replace(/:[a-zA-Z0-9]+/, id);
+        link.fullUrl = (link.url).replace(/:[a-zA-Z0-9]+/, id);
         return req.sendLink(link, {}, app.setLinks).then(function() {
             return model.load(vm);
         });

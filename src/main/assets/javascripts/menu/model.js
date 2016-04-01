@@ -37,7 +37,7 @@ define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
     model.loadUser = function(userId) {
         const link = app.getLink("user", "GET", model.userContentType);
         if (link) {
-            link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, userId));
+            link.fullUrl = link.url.replace(/:[a-zA-Z0-9]+/, userId);
             req.sendLink(link, {}, undefined).then(
                 function(user) {
                     model.vm.loggedInUser(user.name);
@@ -50,7 +50,7 @@ define(['base/request', 'app/model', 'mithril'], function (req, app, m) {
     model.loadToken = function(tokenId) {
         const link = app.getLink("token", "GET", model.tokenContentType);
         if (link) {
-            link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, tokenId));
+            link.fullUrl = link.url.replace(/:[a-zA-Z0-9]+/, tokenId);
             return req.sendLink(link,{}, undefined).then(
                 function(token) {
                     sessionStorage.tokenId = token.id;

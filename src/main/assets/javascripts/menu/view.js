@@ -18,7 +18,7 @@ define(['./model', 'app/model', 'base/localization', 'i18n!nls/messages',
     const logout = function(event) {
         $(event.target).popup('destroy');
         const link = app.getLink("token", "DELETE", model.tokenContentType);
-        link.fullUrl = app.fullUri(link.url.replace(/:[a-zA-Z0-9]+/, sessionStorage.tokenId));
+        link.fullUrl = link.url.replace(/:[a-zA-Z0-9]+/, sessionStorage.tokenId);
         req.sendLink(link, {}, undefined).then(
             function(token) {
                 sessionStorage.removeItem("tokenId");

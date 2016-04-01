@@ -61,7 +61,7 @@ define(['menu', 'app/model', 'base/request', 'mithril'], function (menu, app, re
     model.load = function(vm) {
         const params = m.route.param();
 
-        vm.url = app.fullUri(params.path);
+        vm.url = params.path;
 
         if (vm.url.indexOf(':') >= 0) {
             return req.head(vm.url, app.setLinks).then(

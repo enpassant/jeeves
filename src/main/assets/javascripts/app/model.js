@@ -26,10 +26,6 @@ define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
         };
     };
 
-    model.fullUri = function(uri) {
-        return uri;
-    };
-
     model.messages = m.prop(Immutable.List([]));
 
     model.links = m.prop(Immutable.List([]));
@@ -40,7 +36,7 @@ define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
             const methods = l.method.split(" ");
             methods.forEach(function(method, j) {
                 const link = Immutable.Map(l)
-                    .set("fullUrl", model.fullUri(l.url))
+                    .set("fullUrl", l.url)
                     .set("method", method);
                 links.push(link);
             });
