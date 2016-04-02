@@ -9,7 +9,7 @@ define(['./model', 'menu', 'collection', 'blog', 'mithril'],
                 this.component = model.components[params.componentName];
             }
         } else {
-            menu.load('/api').then(menu.initToken, model.errorHandler(menu));
+            menu.load('/').then(menu.initToken, model.errorHandler(menu));
         }
     };
 });

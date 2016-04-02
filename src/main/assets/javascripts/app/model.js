@@ -1,8 +1,6 @@
 define(['base/request', 'mithril', 'immutable'], function (req, m, Immutable) {
     const model = {};
 
-    model.restUri = m.prop("/api");
-
     model.Message = function(header, content, type, action) {
         this.header = header;
         this.content = content;

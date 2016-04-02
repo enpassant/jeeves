@@ -31,31 +31,34 @@ class Service(val config: Config, val routerDefined: Boolean,
   import TokenDirectives._
   import UserDirectives._
 
+  val prefix = "api"
   val bindingFuture = Http().bindAndHandle(route, config.host, config.port)
 
   def route = {
     logger {
       restartTick {
-        path("") {
-          getFromResource(s"public/html/index.html")
-        } ~
-        path("""([^/]+\.html).*""".r) { path =>
-          getFromResource(s"public/html/$path")
-        } ~
-        prefixRoute("api") {
+        prefixRoute(prefix) {
           optionalToken { optToken =>
             optionalUser(optToken) { optUser =>
               (serviceLinks.map(_(optUser)).reduce(_ & _) & tokenLinks & userItemLinks) {
-                headComplete
+                path("") {
+                  headComplete ~
+                  getFromResource(s"public/html/index.html")
+                }
               } ~
-              (tokenLinks & userItemLinks) {
-                services.map(_(optUser)).reduce(_ ~ _) ~
-                pathPrefix("tokens") {
-                  handleTokens
+              pathPrefix(prefix) {
+                (tokenLinks & userItemLinks) {
+                  services.map(_(optUser)).reduce(_ ~ _) ~
+                  pathPrefix("tokens") {
+                    handleTokens
+                  }
                 }
               }
             }
           }
+        } ~
+        path("""([^/]+\.html).*""".r) { path =>
+          getFromResource(s"public/html/$path")
         } ~
         path(Rest) { path =>
           getFromResource(s"public/$path")
@@ -74,7 +77,6 @@ class Service(val config: Config, val routerDefined: Boolean,
   }
 
   def prefixRoute(prefix: String)(route: Route)(implicit ec: ExecutionContext): Route =
-  pathPrefix(prefix) {
     requestContext =>
       route(requestContext) map { result =>
         result match {
@@ -84,7 +86,6 @@ class Service(val config: Config, val routerDefined: Boolean,
           case _ => result
         }
       }
-  }
 
   private def mapLinkHeaders(prefix: String)(headers: Seq[HttpHeader]):
     Seq[HttpHeader] = headers.map { header =>
