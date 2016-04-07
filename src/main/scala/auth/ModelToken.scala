@@ -2,7 +2,7 @@ package component
 
 import core._
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorLogging, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import java.util.UUID
@@ -10,7 +10,7 @@ import org.joda.time.DateTime
 import scala.collection.immutable.Map
 import scala.concurrent.duration._
 
-class ModelToken(val mode: Option[String]) extends Actor {
+class ModelToken(val mode: Option[String]) extends Actor with ActorLogging {
   implicit val timeout = Timeout(10.seconds)
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -31,10 +31,10 @@ class ModelToken(val mode: Option[String]) extends Actor {
         case Some(user: User) =>
           val token = Token(UUID.randomUUID.toString, user.id)
           val newTableToken = tableToken.filterNot(_.id == token.id)
-            context.become(process(token +: newTableToken))
-            service ! token
+          service ! token
+          context.become(process(token +: newTableToken))
         case None =>
-            service ! None
+          service ! None
       }
 
     case DeleteEntity(id) =>
