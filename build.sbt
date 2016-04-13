@@ -31,6 +31,7 @@ libraryDependencies ++= Seq(
   "org.webjars"             % "jquery"                  % "2.2.1",
   "org.webjars"             % "immutable"               % "3.7.3",
   "com.github.rjeschke"     % "txtmark"                 % "0.13",
+  "com.github.enpassant"   %% "wooster"                 % "1.0-SNAPSHOT",
   "io.spray"               %% "spray-testkit"           % sprayVersion   % "test"
 )
 
