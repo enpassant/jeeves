@@ -15,7 +15,6 @@ class Supervisor(val config: Config) extends Actor with ActorLogging {
   val tickActor = config.router map {
     _ => context.actorOf(TickActor.props(config), TickActor.name)
   }
-  tickActor.map(_ ! Tick)
 
   val modelBlog = context.actorOf(ModelBlog.props(config.mode), ModelBlog.name)
   val modelComment = context.actorOf(ModelComment.props(config.mode), ModelComment.name)
@@ -24,7 +23,7 @@ class Supervisor(val config: Config) extends Actor with ActorLogging {
 
   val blogServiceActorModel = BlogDirectives.blogService("blogs", modelBlog ? _)
   val userServiceActorModel = UserDirectives.userService("users", modelUser ? _)
-  val service = context.actorOf(Service.props(config, tickActor.isDefined,
+  val service = context.actorOf(Service.props(config,
     List(blogServiceActorModel, userServiceActorModel),
     List(BlogDirectives.blogLinks, UserDirectives.userMenuLinks)),
     Service.name)

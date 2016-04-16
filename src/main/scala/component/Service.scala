@@ -16,7 +16,7 @@ import org.joda.time.DateTime
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext
 
-class Service(val config: Config, val routerDefined: Boolean,
+class Service(val config: Config,
   services: List[Option[User] => Route],
   serviceLinks: List[Option[User] => Directive0])
   extends Actor
@@ -33,6 +33,15 @@ class Service(val config: Config, val routerDefined: Boolean,
 
   val prefix = "api"
   val bindingFuture = Http().bindAndHandle(route, config.host, config.port)
+  bindingFuture foreach { serverBinding =>
+    log.info(s"Micro service jeeves listen on ${serverBinding.localAddress}")
+    if (config.router.isDefined) {
+      val microService = MicroService(UUID.randomUUID.toString, "",
+        config.host, serverBinding.localAddress.getPort, config.mode)
+      val tickActor = Supervisor.getChild(TickActor.name)
+      tickActor ! microService
+    }
+  }
 
   def route = {
     logger {
@@ -68,7 +77,7 @@ class Service(val config: Config, val routerDefined: Boolean,
   }
 
   def restartTick(route: Route): Route = {
-    if (routerDefined) {
+    if (config.router.isDefined) {
       val tickActor = Supervisor.getChild(TickActor.name)
       requestContext =>
         tickActor ! Restart
@@ -121,8 +130,8 @@ class Service(val config: Config, val routerDefined: Boolean,
 }
 
 object Service {
-  def props(config: Config, routerDefined: Boolean,
+  def props(config: Config,
     services: List[Option[User] => Route], serviceLinks: List[Option[User] => Directive0]) =
-    Props(new Service(config, routerDefined, services, serviceLinks))
+    Props(new Service(config, services, serviceLinks))
   def name = "service"
 }
