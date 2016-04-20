@@ -13,8 +13,7 @@ import java.util.UUID
 import org.joda.time.DateTime
 import scala.concurrent.Future
 
-object TokenDirectives extends CommentDirectives
-  with CommonDirectives with TokenFormats with CommentFormats
+object TokenDirectives extends CommonDirectives with TokenFormats
 {
   import scala.concurrent.ExecutionContext.Implicits.global
 
