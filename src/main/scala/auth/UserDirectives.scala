@@ -15,7 +15,7 @@ import org.joda.time.DateTime
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-object UserDirectives extends CommonDirectives with BlogFormats with UserFormats {
+object UserDirectives extends CommonDirectives with UserFormats {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val modelUser = Supervisor.getChild(ModelUser.name)

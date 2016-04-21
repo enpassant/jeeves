@@ -12,7 +12,7 @@ import akka.pattern.ask
 import java.util.UUID
 import org.joda.time.DateTime
 
-trait CommentDirectives extends CommonDirectives with BlogFormats with CommentFormats {
+trait CommentDirectives extends CommonDirectives with CommentFormats {
   val modelComment = Supervisor.getChild(ModelComment.name)
 
   def handleComments(optUser: Option[User], blogId: String) = pathEnd {
