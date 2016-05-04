@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 
 import core._
 
-class Supervisor(val config: Config) extends Actor with ActorLogging {
+class SupervisorActor(val config: Config) extends Actor with ActorLogging {
   import context.dispatcher
   implicit val timeout = Timeout(3.seconds)
 
@@ -21,10 +21,10 @@ class Supervisor(val config: Config) extends Actor with ActorLogging {
   val modelUser = context.actorOf(ModelUser.props(config.mode), ModelUser.name)
   val modelToken = context.actorOf(ModelToken.props(config.mode), ModelToken.name)
 
-  val blogServiceActorModel = BlogDirectives.blogService("blogs", modelBlog ? _)
-  val userServiceActorModel = UserDirectives.userService("users", modelUser ? _)
+  val blogService = BlogDirectives.blogService("blogs", modelBlog ? _)
+  val userService = UserDirectives.userService("users", modelUser ? _)
   val service = context.actorOf(Service.props(config,
-    List(blogServiceActorModel, userServiceActorModel),
+    List(blogService, userService),
     List(BlogDirectives.blogLinks, UserDirectives.userMenuLinks)),
     Service.name)
 
@@ -34,8 +34,14 @@ class Supervisor(val config: Config) extends Actor with ActorLogging {
 }
 
 object Supervisor {
-  val actorSystem = ActorSystem("james")
-  def props(config: Config) = Props(new Supervisor(config))
+  var actorSystem: ActorSystem = null
+
+  def apply(systemName: String, config: Config) = {
+    actorSystem = ActorSystem(systemName)
+    val props = Props(new SupervisorActor(config))
+    actorSystem.actorOf(props, name)
+  }
+
   def name = "supervisor"
 
   def getChild(childName: String) = actorSystem.actorSelection(s"/user/$name/$childName")

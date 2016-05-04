@@ -22,8 +22,7 @@ object Main extends App {
 
   // parser.parse returns Option[C]
   parser.parse(args, Config()) match {
-    case Some(config) =>
-      val superVisor = Supervisor.actorSystem.actorOf(Supervisor.props(config), Supervisor.name)
+    case Some(config) => Supervisor("jeeves", config)
     case None =>
   }
 }
