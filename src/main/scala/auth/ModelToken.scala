@@ -2,7 +2,7 @@ package component
 
 import core._
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, ActorRefFactory, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import java.util.UUID
@@ -45,6 +45,7 @@ class ModelToken(val mode: Option[String]) extends Actor with ActorLogging {
 }
 
 object ModelToken {
-  def props(mode: Option[String]) = Props(new ModelToken(mode))
   def name = "modelToken"
+  def apply(mode: Option[String])(implicit factory: ActorRefFactory) =
+    factory.actorOf(Props(new ModelToken(mode)), name)
 }

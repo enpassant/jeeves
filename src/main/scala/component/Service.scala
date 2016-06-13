@@ -1,8 +1,9 @@
 package component
 
 import core._
+import collector._
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSelection, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
@@ -14,10 +15,10 @@ import akka.stream.ActorMaterializer
 import java.util.UUID
 import org.joda.time.DateTime
 import scala.collection.immutable.Seq
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future, ExecutionContext}
 
 class Service(val config: Config,
-  services: List[Option[User] => Route],
+  services: List[ActorRef],
   serviceLinks: List[Option[User] => Directive0])
   extends Actor
   with CommonDirectives
@@ -43,6 +44,9 @@ class Service(val config: Config,
     }
   }
 
+  val matcher: PartialFunction[Any, Route] = { case r: Route => r }
+  val tracker = Countdown[Route](services.size)
+
   def route = {
     logger {
       restartTick {
@@ -57,7 +61,10 @@ class Service(val config: Config,
               } ~
               pathPrefix(prefix) {
                 (tokenLinks & userItemLinks) {
-                  services.map(_(optUser)).reduce(_ ~ _) ~
+                  val (result, collector) = ResponseCollector(tracker, matcher)
+                  services foreach { _.tell(GetServiceRoute(optUser), collector) }
+                  val routes: Route = a => result flatMap { r => r.values.reduce(_ ~ _)(a) }
+                  routes ~
                   pathPrefix("tokens") {
                     handleTokens
                   }
@@ -130,8 +137,11 @@ class Service(val config: Config,
 }
 
 object Service {
-  def props(config: Config,
-    services: List[Option[User] => Route], serviceLinks: List[Option[User] => Directive0]) =
-    Props(new Service(config, services, serviceLinks))
+  def apply(
+    config: Config,
+    services: List[ActorRef],
+    serviceLinks: List[Option[User] => Directive0])
+  (implicit factory: ActorRefFactory) =
+    factory.actorOf(Props(new Service(config, services, serviceLinks)))
   def name = "service"
 }

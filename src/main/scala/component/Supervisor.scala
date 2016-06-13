@@ -16,20 +16,23 @@ class SupervisorActor(val config: Config) extends Actor with ActorLogging {
     _ => context.actorOf(TickActor.props(config), TickActor.name)
   }
 
-  val modelBlog = context.actorOf(ModelBlog.props(config.mode), ModelBlog.name)
-  val modelComment = context.actorOf(ModelComment.props(config.mode), ModelComment.name)
-  val modelUser = context.actorOf(ModelUser.props(config.mode), ModelUser.name)
-  val modelToken = context.actorOf(ModelToken.props(config.mode), ModelToken.name)
+  val modelBlog = ModelBlog(config.mode)
+  val modelComment = ModelComment(config.mode)
+  val modelUser = ModelUser(config.mode)
+  val modelToken = ModelToken(config.mode)
 
-  val blogService = BlogDirectives.blogService("blogs", modelBlog ? _)
-  val userService = UserDirectives.userService("users", modelUser ? _)
-  val service = context.actorOf(Service.props(config,
-    List(blogService, userService),
-    List(BlogDirectives.blogLinks, UserDirectives.userMenuLinks)),
-    Service.name)
+  val blogServiceActor = BlogService("blogs")
+  blogServiceActor ! UseModel(Some(modelBlog))
+
+  val userServiceActor = UserService("users")
+  userServiceActor ! UseModel(Some(modelUser))
+
+  val service = Service(config,
+    List(blogServiceActor, userServiceActor),
+    List(BlogDirectives.blogLinks, UserDirectives.userMenuLinks))
 
   def receive = {
-    case _ =>
+    case msg => log.warning("Unknown message: {}", msg)
   }
 }
 

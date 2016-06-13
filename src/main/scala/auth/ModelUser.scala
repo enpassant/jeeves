@@ -3,7 +3,7 @@ package component
 import core._
 import Roles._
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorRefFactory, Props}
 import java.util.UUID
 import org.joda.time.DateTime
 import scala.collection.immutable.Map
@@ -47,6 +47,7 @@ class ModelUser(val mode: Option[String]) extends Actor {
 }
 
 object ModelUser {
-  def props(mode: Option[String]) = Props(new ModelUser(mode))
   def name = "modelUser"
+  def apply(mode: Option[String])(implicit factory: ActorRefFactory) =
+    factory.actorOf(Props(new ModelUser(mode)), name)
 }
